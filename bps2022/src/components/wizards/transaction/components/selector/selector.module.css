@@ -13,7 +13,7 @@
     grid-column-end: 1;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .origin-bank-account-internal {
@@ -23,7 +23,7 @@
     grid-column-end: 1;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .origin-cash-account {
@@ -33,7 +33,7 @@
     grid-column-end: 1;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .origin-personal-account {
@@ -43,7 +43,7 @@
     grid-column-end: 1;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .origin-external-account {
@@ -53,7 +53,7 @@
     grid-column-end: 1;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .target-bank-account-external {
@@ -63,7 +63,7 @@
     grid-column-end: 2;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .target-bank-account-internal {
@@ -73,7 +73,7 @@
     grid-column-end: 2;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .target-cash-account {
@@ -83,7 +83,7 @@
     grid-column-end: 2;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .target-personal-account {
@@ -93,7 +93,7 @@
     grid-column-end: 2;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .target-external-account {
@@ -103,7 +103,7 @@
     grid-column-end: 2;
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
 }
 .marker {

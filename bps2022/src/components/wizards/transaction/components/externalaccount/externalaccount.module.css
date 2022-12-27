@@ -1,0 +1,126 @@
+.page {
+    display: grid;
+    grid-template-rows: auto auto 1fr 1fr auto;
+    grid-template-columns: 1fr;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 2rem;   
+}
+.header {
+    grid-row-start: 1;
+    grid-row-end: 1;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    height: fit-content;
+}
+.search {
+    grid-row-start: 2;
+    grid-row-end: 2;
+    height: 2.5rem;
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 2.5rem;
+}
+.search input {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    padding: 0.25rem;
+    height: 1.75rem;
+}
+.search input:focus {
+    outline-width: 0;
+}
+.search div {
+    background-color:lightskyblue;
+    height: 1.75rem;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    border: 1px solid;
+    border-left: none;
+    font-size: 1.25rem;
+    color: #777;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+/* accounts */
+.accounts-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 1rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+.accounts-item-current {
+    background-color: lightblue !important;
+}
+.accounts-list {
+    grid-row-start: 4;
+    grid-row-end: 4;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    border: 1px solid #ececec
+}
+.accounts-item:nth-child(even) {
+    background-color: #fafafa;
+}
+.accounts-not-in-list {
+    grid-row-start: 5;
+    grid-row-end: 5;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 2.5rem;
+    height: 2.5rem;
+}
+/* https://www.kallmanation.com/styling-a-checkbox-with-only-css */
+.accounts-not-in-list input {
+    display: inline-block;
+    height: 1.25rem;
+    width: 1.25rem;
+}
+.accounts-not-in-list div {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.25rem;
+    margin-left: 0.5rem;
+    color: #777;
+}
+
+/* owners */
+.owners-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 1rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+.owners-item-current {
+    background-color: lightblue !important;
+}
+.owners-list {
+    grid-row-start: 3;
+    grid-row-end: 3;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    border: 1px solid #ececec
+}
+.owners-item:nth-child(even) {
+    background-color: #fafafa;
+}

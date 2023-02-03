@@ -2,17 +2,16 @@ import React, { FC, useState } from 'react';
 
 import { SearchOutlined } from '@ant-design/icons';
 
-import { TransactionAccountsInfoHolder, TransactionAccountsInfoSubType } from '../../../../../domain/automaton/automaton';
 import styles from './bankaccount.module.css';
 import { mock } from './mock';
 
 type Props = {
-    holder: TransactionAccountsInfoHolder,
-    subtype: TransactionAccountsInfoSubType,
-    direction: boolean,
+    subtype: "INTERNAL" | "EXTERNAL",
+    direction: -1 | 1,
+    primary: boolean,
     onAccount: (id: number) => void,
 };
-export const BankAccount: FC<Props> = ({ holder, direction, onAccount }: Props) => {
+export const BankAccount: FC<Props> = ({ subtype, direction, onAccount }: Props) => {
     const [currency, setCurrency] = useState(-1);
     const onCurrency = (id: number) => {
         setCurrency(id);
@@ -25,7 +24,7 @@ export const BankAccount: FC<Props> = ({ holder, direction, onAccount }: Props) 
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (direction? "Отправка: ": "Приём: ") + (holder === "N"? "Расчётные счета внешние": "Расчётные счета организации")}
+                { (direction === 1? "Приём: ": "Отправка: ") + (subtype === "INTERNAL"? "Расчётные счета организации": "Расчётные счета внешние")}
             </div>
             <div className={styles.search}>
                 <input type="text" placeholder='Поиск'></input>
@@ -34,7 +33,7 @@ export const BankAccount: FC<Props> = ({ holder, direction, onAccount }: Props) 
             <ul className={styles["accounts-list"]}>
                 {
                     mock
-                        .filter(item => (holder === "N" && item.external === true) || (holder === "Y" && item.external === false))
+                        .filter(item => (subtype && item.external === true) || (subtype && item.external === false))
                         .sort((a, b) => (a.organization < b.organization)? -1: 1)
                         .map(item =>
                             <li className={[styles["accounts-item"], currency === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.account} onClick={() => onCurrency(item.id)}>

@@ -2,17 +2,16 @@ import React, { FC, useState } from 'react';
 
 import { SearchOutlined } from '@ant-design/icons';
 
-import { TransactionAccountsInfoHolder, TransactionAccountsInfoSubType } from '../../../../../domain/automaton/automaton';
 import styles from './cashaccount.module.css';
 import { mock } from './mock';
 
 type Props = {
-    holder: TransactionAccountsInfoHolder,
-    subtype: TransactionAccountsInfoSubType,
-    direction: boolean,
+    subtype: "INTERNAL" | "EXTERNAL",
+    direction: -1 | 1,
+    primary: boolean,
     onAccount: (id: number) => void,
 };
-export const CashAccount: FC<Props> = ({ holder, direction, onAccount }: Props) => {
+export const CashAccount: FC<Props> = ({ subtype, direction, onAccount }: Props) => {
     const [currency, setCurrency] = useState(-1);
     const onCurrency = (id: number) => {
         setCurrency(id);
@@ -25,7 +24,7 @@ export const CashAccount: FC<Props> = ({ holder, direction, onAccount }: Props) 
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (direction? "Отправка: ": "Приём: ") + (holder === "N"? "Кассовые счета внешние": "Кассовые счета организации") }
+                { (direction === 1? "Приём: ": "Отправка: ") + (subtype === "INTERNAL"? "Кассовые счета организации": "Кассовые счета внешние") }
             </div>
             <div className={styles.search}>
                 <input type="text" placeholder='Поиск'></input>

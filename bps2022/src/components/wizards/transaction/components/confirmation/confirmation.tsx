@@ -1,8 +1,11 @@
 import React, { FC } from 'react';
 
+import { TransactionTypesIdentity } from '../../../../../domain/automaton/automaton';
+
 import styles from './confirmation.module.css';
 
 type Props = {
+    transaction: TransactionTypesIdentity | null,
     onConfirm: (confirmed: boolean) => void,
 };
 

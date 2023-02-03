@@ -2,17 +2,16 @@ import React, { FC, useState } from 'react';
 
 import { SearchOutlined } from '@ant-design/icons';
 
-import { TransactionAccountsInfoHolder, TransactionAccountsInfoSubType } from '../../../../../domain/automaton/automaton';
 import styles from './externalaccount.module.css';
 import { mock_owners, mock_accounts } from './mock';
 
 type Props = {
-    holder: TransactionAccountsInfoHolder,
-    subtype: TransactionAccountsInfoSubType,
-    direction: boolean,
+    subtype: "INTERNAL" | "EXTERNAL",
+    direction: -1 | 1,
+    primary: boolean,
     onAccount: (id: number) => void,
 };
-export const ExternalAccount: FC<Props> = ({ holder, direction, onAccount }: Props) => {
+export const ExternalAccount: FC<Props> = ({ subtype, direction, onAccount }: Props) => {
     const [currencyOwner, setCurrencyOwner] = useState(-1);
     const [currencyAccount, setCurrencyAccount] = useState(-1);
     const onCurrencyOwner = (id: number) => {
@@ -31,7 +30,7 @@ export const ExternalAccount: FC<Props> = ({ holder, direction, onAccount }: Pro
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (direction? "Отправка: ": "Приём: ") + (holder === "N"? "Внешние счета клиентов": "Внешние счета организации") }
+                { (direction === 1? "Приём: ": "Отправка: ") + (subtype === "INTERNAL"? "Внешние счета организации": "Внешние счета клиентов") }
             </div>
             <div className={styles.search}>
                 <input type="text" placeholder='Поиск'></input>

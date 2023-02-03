@@ -1,15 +1,16 @@
 import React, { FC, useState } from 'react';
 
 import styles from './narrowing.module.css';
-import { TransactionTypesIdentity, TransactionAccountsTypes, automaton } from '../../../../../domain/automaton/automaton';
+import { TransactionTypesIdentity, TransactionGroupSelector, automaton } from '../../../../../domain/automaton/automaton';
 
 type Props = {
-    origin: TransactionAccountsTypes,
-    target: TransactionAccountsTypes,
-    onTransaction: (id: TransactionTypesIdentity | null) => void,
+    origin: TransactionGroupSelector | null,
+    target: TransactionGroupSelector | null,
+    transaction: TransactionTypesIdentity | null,
+    onTransaction: (id: TransactionTypesIdentity) => void,
 };
-export const Narrowing: FC<Props> = ({ origin, target, onTransaction }: Props) => {
-    const [currency, setCurrency] = useState<TransactionTypesIdentity | null>(null);
+export const Narrowing: FC<Props> = ({ origin, target, transaction, onTransaction }: Props) => {
+    const [currency, setCurrency] = useState<TransactionTypesIdentity | null>(transaction);
     const onCurrency = (id: TransactionTypesIdentity) => {
         setCurrency(id);
         onTransaction(id);
@@ -28,9 +29,9 @@ export const Narrowing: FC<Props> = ({ origin, target, onTransaction }: Props) =
                             <div className={styles["transactions-item-box"]} key={item[0]}>
                                 <div className={[styles["transaction-item-marker"], currency === item[0]? styles["transactions-item-current"]: ""].join(' ')} onClick={() => onCurrency(item[0])}>
                                 </div>
-                                <li className={[styles["transactions-item"], currency === item[0]? styles["transactions-item-current"]: ""].join(" ")} value={item[6]} onClick={() => onCurrency(item[0])}>
+                                <li className={[styles["transactions-item"], currency === item[0]? styles["transactions-item-current"]: ""].join(" ")} value={item[4]} onClick={() => onCurrency(item[0])}>
                                     <div>
-                                        {item[6]}
+                                        {item[4]}
                                     </div>
                                 </li>
                             </div>)

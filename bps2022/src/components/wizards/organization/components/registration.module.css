@@ -1,0 +1,114 @@
+.page {
+    display: grid;
+    grid-template-rows: auto auto auto auto auto 1fr;
+    grid-template-columns: auto 1fr;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 2rem;
+    row-gap: 0.25rem;   
+    font-family: 'Roboto';
+}
+.header {
+    grid-row-start: 1;
+    grid-row-end: 1;
+    grid-column-start: 1;
+    grid-column-end: span 2;
+    font-size: 1.5rem;
+    height: fit-content;
+    margin-bottom: 1rem;
+}
+.name {
+    grid-row-start: 2;
+    grid-row-end: 2;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+.name-label {
+    display: flex;
+    align-items: center;
+    grid-row-start: 2;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    font-size: 1rem;
+    width: 100%;
+    margin-right: 0.5rem;
+}
+.inn {
+    grid-row-start: 3;
+    grid-row-end: 3;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+.inn-label {
+    display: flex;
+    align-items: center;
+    grid-row-start: 3;
+    grid-row-end: 3;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    font-size: 1rem;
+    width: 100%;
+    margin-right: 0.5rem;
+}
+.kpp {
+    grid-row-start: 4;
+    grid-row-end: 4;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+.kpp-label {
+    display: flex;
+    align-items: center;
+    grid-row-start: 4;
+    grid-row-end: 4;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    font-size: 1rem;
+    width: 100%;
+    margin-right: 0.5rem;
+}
+.clients-list-search {
+    grid-row-start: 5;
+    grid-row-end: 5;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+.clients-list-label {
+    display: flex;
+    align-items: center;
+    grid-row-start: 5;
+    grid-row-end: span 6;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    font-size: 1rem;
+    width: 100%;
+    margin-right: 0.5rem;
+}
+.clients-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 1rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+.clients-item-current {
+    background-color: lightblue !important;
+}
+.clients-list {
+    grid-row-start: 6;
+    grid-row-end: 6;
+    grid-column-start: 2;
+    grid-column-end: 2;
+    font-size: 1rem;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    border: 1px solid #ececec;
+    border-radius: 10px;
+    margin: 0;
+}
+.clients-item:nth-child(even) {
+    background-color: #fafafa;
+}

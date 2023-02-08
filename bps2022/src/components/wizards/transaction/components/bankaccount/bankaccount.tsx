@@ -33,7 +33,7 @@ export const BankAccount: FC<Props> = ({ subtype, direction, onAccount }: Props)
             <ul className={styles["accounts-list"]}>
                 {
                     mock
-                        .filter(item => (subtype && item.external === true) || (subtype && item.external === false))
+                        .filter(item => (subtype === "EXTERNAL" && item.external === true) || (subtype === "INTERNAL" && item.external === false))
                         .sort((a, b) => (a.organization < b.organization)? -1: 1)
                         .map(item =>
                             <li className={[styles["accounts-item"], currency === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.account} onClick={() => onCurrency(item.id)}>

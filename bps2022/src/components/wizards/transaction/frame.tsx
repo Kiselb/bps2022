@@ -11,7 +11,11 @@ import { ExternalAccount } from './components/externalaccount/externalaccount';
 import { Narrowing } from './components/narrowing/narrowing';
 import { Sums } from './components/sums/sums';
 import { Confirmation } from './components/confirmation/confirmation';
+import { Article } from './components/article/article';
 import { Error } from './components/error/error';
+
+import { Params as ParamsBankAccountRegistration, Registration as BankAccountRegistration } from '../../wizards/accounts/bankaccount/components/registration';
+import { Params as ParamsOrganizationRegistration, Registration as OrganizationRegistration } from '../../wizards/organization/components/registration';
 
 import styles from './frame.module.css';
 
@@ -30,7 +34,7 @@ export const Frame: FC = () => {
     const onAccount = (id: number) => { console.log(id)};
     const onTransaction = (transaction_id: TransactionTypesIdentity) => {
         setTransaction(() => transaction_id);
-        setQueue(() => [...automaton.filter(item => item[0] === (automaton.filter(item => item[0] === transaction_id)[0][1] || transaction_id))[0][3]!]);
+        setQueue(() => [...automaton.filter(item => item[0] === transaction_id)[0][3]!]);
     };
     const onSums = (sum: number) => { console.log(sum)};
     const onSumsCurrency = (currency: string) => { console.log(currency)};
@@ -44,6 +48,9 @@ export const Frame: FC = () => {
         if (step === -2) return;
         setStep(step => step - 1);
     }
+    const onReady = (params: ParamsOrganizationRegistration) => {
+        console.log(params);
+    }
 
     const renderPages = (step: number) => {
         if (step === -2) {
@@ -54,7 +61,7 @@ export const Frame: FC = () => {
             const page = queue[step];
             switch (page.type) {
                 case "SUMEXCHANGE":
-                    return (<Sums onOriginSum={onSums} onTargetSum={onSums} onOriginCurrency={onSumsCurrency} onTargetCurrency={onSumsCurrency} onRate={onSums} onExchange={onSumsExchange}/>);
+                    return (<Sums exchange={page.exchange} onOriginSum={onSums} onTargetSum={onSums} onOriginCurrency={onSumsCurrency} onTargetCurrency={onSumsCurrency} onRate={onSums} onExchange={onSumsExchange}/>);
                 case "BANKACCOUNT":
                     return (<BankAccount primary={page.primary} subtype={page.subtype} direction={page.direction} onAccount={onAccount}/>);
                 case "CASHACCOUNT":
@@ -72,7 +79,7 @@ export const Frame: FC = () => {
                 case "SERVICEFEE":
                     return null;
                 case "ARTICLE":
-                    return null;
+                    return (<Article subtype={page.subtype} onAccount={onAccount}/>);
                 case "CONFIRMATION":
                     return (<Confirmation onConfirm={console.log} transaction={transaction}/>);
                 default:
@@ -87,7 +94,8 @@ export const Frame: FC = () => {
                 Создание транзакции
             </div>
             <div className={styles.pages}>
-                { renderPages(step) }
+                {/* { renderPages(step) } */}
+                <OrganizationRegistration context="SENDER" subtype="EXTERNAL" onReady={onReady}/>
             </div>
             <div className={styles.navigation}>
                 <div className={styles["navigation-left"]}>

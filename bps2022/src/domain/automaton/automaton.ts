@@ -96,7 +96,7 @@ export const automaton: Automaton = [
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, fee: true },
         { type: "ARTICLE", subtype: "INCOME" },
         { type: "CONFIRMATION" },
-    ], "Приём безналичных на внешний счет"],
+    ], "Приём безналичных на внешний счёт в доход"],
     ["01-020", null, ["BAE", "BAE"], [
         { type: "SUMEXCHANGE", exchange: false },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, fee: false },
@@ -278,7 +278,7 @@ export const automaton: Automaton = [
                                                                                     
     ["13-010", null, ["CAA", "XAC"], [
         { type: "SUMEXCHANGE", exchange: false },
-        { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, fee: true },
+        { type: "EXTERNALACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, fee: true },
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, fee: true },
         { type: "CONFIRMATION" },
     ], "Внесение наличных клиентом в развитие"],
@@ -323,7 +323,7 @@ export const automaton: Automaton = [
     ], "Взаимозачёт между клиентами"],
     ["17-020", null, ["PAC", "PAC"], [
         { type: "SUMEXCHANGE", exchange: false },
-        { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, fee: false },
+        { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, fee: false },
         { type: "ARTICLE", subtype: "INCOME" },
         { type: "CONFIRMATION" },
     ], "Списание средств с клиента"],
@@ -348,13 +348,13 @@ export const automaton: Automaton = [
                                                                                     
     ["18-010", null, ["PAC", "XAC"], [
         { type: "SUMEXCHANGE", exchange: false },
-        { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, fee: false },
+        { type: "EXTERNALACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, fee: false },
         { type: "ARTICLE", subtype: "INCOME" },
         { type: "CONFIRMATION" },
     ], "Начисление в развитие доход"],
     ["18-020", null, ["PAC", "XAC"], [
         { type: "SUMEXCHANGE", exchange: false },
-        { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, fee: false },
+        { type: "EXTERNALACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, fee: false },
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, fee: true },
         { type: "CONFIRMATION" },
     ], "Начисление в развитие и клиенту"],
@@ -374,7 +374,7 @@ export const automaton: Automaton = [
     ], "Приём наличных из развития"],
     ["21-020", null, ["XAC", "CAA"], [
         { type: "SUMEXCHANGE", exchange: false },
-        { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: -1, fee: true },
+        { type: "EXTERNALACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, fee: true },
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, fee: true },
         { type: "CONFIRMATION" },
     ], "Выдача наличных из развития клиенту"],
@@ -460,7 +460,7 @@ export const automaton: Automaton = [
                                                                                     
     // Доход																	
                                                                                     
-    ["28-010", "01-010", ["INC", "INC"], null, "Приём безналичных на внешний"],
+    ["28-010", "01-010", ["INC", "INC"], null, "Приём безналичных на внешний счёт в доход?"],
     ["28-020", "02-010", ["INC", "INC"], null, "Приём безналичных в доход"],
     ["28-030", "16-010", ["INC", "INC"], null, "Начисление наличных в доход"],
     ["28-040", "18-010", ["INC", "INC"], null, "Начисление в развитие доход"],

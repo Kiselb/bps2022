@@ -25,6 +25,7 @@ export const Narrowing: FC<Props> = ({ origin, target, transaction, onTransactio
                 {
                     automaton
                         .filter(item => item[2][0] === origin && item[2][1] === target)
+                        .map(item => item[1]? automaton.filter(base => base[0] === item[1])[0]: item)
                         .map(item =>
                             <div className={styles["transactions-item-box"]} key={item[0]}>
                                 <div className={[styles["transaction-item-marker"], currency === item[0]? styles["transactions-item-current"]: ""].join(' ')} onClick={() => onCurrency(item[0])}>

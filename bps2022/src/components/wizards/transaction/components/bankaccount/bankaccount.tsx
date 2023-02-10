@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 
 import { SearchOutlined } from '@ant-design/icons';
 
@@ -9,17 +9,21 @@ type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
     direction: -1 | 1,
     primary: boolean,
-    onAccount: (id: number) => void,
+    onReady: (id: number, registration: boolean) => void,
 };
-export const BankAccount: FC<Props> = ({ subtype, direction, onAccount }: Props) => {
-    const [currency, setCurrency] = useState(-1);
+export const BankAccount: FC<Props> = ({ subtype, direction, onReady }: Props) => {
+    const [state, setState] = useState<{ id: number, notinlist: boolean }>({ id: -1, notinlist: false });
+
     const onCurrency = (id: number) => {
-        setCurrency(id);
-        onAccount(id);
+        setState(state => ({ ...state, id }));
     };
     const onChangeInList = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onAccount((event.target.checked)? 0: currency);
-    }
+        setState(state => ({ ...state, notinlist: event.target.checked }));
+    };
+
+    useEffect(() => {
+        onReady(state.id, state.notinlist);
+    }, [state]);
 
     return (
         <div className={styles.page}>
@@ -36,7 +40,7 @@ export const BankAccount: FC<Props> = ({ subtype, direction, onAccount }: Props)
                         .filter(item => (subtype === "EXTERNAL" && item.external === true) || (subtype === "INTERNAL" && item.external === false))
                         .sort((a, b) => (a.organization < b.organization)? -1: 1)
                         .map(item =>
-                            <li className={[styles["accounts-item"], currency === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.account} onClick={() => onCurrency(item.id)}>
+                            <li className={[styles["accounts-item"], state.id === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.account} onClick={() => onCurrency(item.id)}>
                                 <div>
                                     {item.account}
                                 </div>

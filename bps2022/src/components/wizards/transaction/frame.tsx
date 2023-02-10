@@ -1,7 +1,7 @@
 import React, { FC, useState } from "react";
 import { QuestionOutlined, LeftOutlined, RightOutlined, CheckOutlined, UndoOutlined } from '@ant-design/icons';
 
-import { TransactionTypesIdentity, TransactionGroupSelector, WizardPagesTypesUnion, automaton } from '../../../domain/automaton/automaton';
+import { TransactionTypesIdentity, TransactionGroupSelector, WizardPagesTypesUnion, automaton, WizardPagesTypes_REGBANKACCOUNT } from '../../../domain/automaton/automaton';
 
 import { Selector } from './components/selector/selector';
 import { BankAccount } from './components/bankaccount/bankaccount';
@@ -48,11 +48,24 @@ export const Frame: FC = () => {
         if (step === -2) return;
         setStep(step => step - 1);
     }
-    const onReady = (params: ParamsOrganizationRegistration) => {
-        console.log(params);
+    const onReady = (params: any, registration: boolean) => {
+        return;
+        // console.log(params, registration);
+        // if (registration) {
+        //     const page = queue[step];
+        //     switch (page.type) {
+        //         case "BANKACCOUNT":
+        //             //const additional: WizardPagesTypes_REGBANKACCOUNT = { type: page.registration, parent: step, registration: "REGORGANIZATION" };
+        //             setQueue(queue => [...queue.slice(0, step + 1), { type: page.registration, parent: step, registration: "REGORGANIZATION" }, ...queue.slice(step + 1)]);
+        //             break;
+        //         default:
+        //             console.log("Unknown parent");
+        //             break;
+        //     }
+        // }
     }
 
-    const renderPages = (step: number) => {
+    const CurrentPage: FC<{ step: number }> = ({ step }) => {
         if (step === -2) {
             return (<Selector onOrigin={onOrigin} onTarget={onTarget} origin={selection.origin} target={selection.target}/>);
         } else if (step === -1) {
@@ -63,7 +76,7 @@ export const Frame: FC = () => {
                 case "SUMEXCHANGE":
                     return (<Sums exchange={page.exchange} onOriginSum={onSums} onTargetSum={onSums} onOriginCurrency={onSumsCurrency} onTargetCurrency={onSumsCurrency} onRate={onSums} onExchange={onSumsExchange}/>);
                 case "BANKACCOUNT":
-                    return (<BankAccount primary={page.primary} subtype={page.subtype} direction={page.direction} onAccount={onAccount}/>);
+                    return (<BankAccount primary={page.primary} subtype={page.subtype} direction={page.direction} onReady={onReady}/>);
                 case "CASHACCOUNT":
                     return (<CashAccount primary={page.primary} subtype={page.subtype} direction={page.direction} onAccount={onAccount}/>);
                 case "PERSONALACCOUNT":
@@ -82,6 +95,8 @@ export const Frame: FC = () => {
                     return (<Article subtype={page.subtype} onAccount={onAccount}/>);
                 case "CONFIRMATION":
                     return (<Confirmation onConfirm={console.log} transaction={transaction}/>);
+                case "REGBANKACCOUNT":
+                    return (<BankAccountRegistration context="SENDER" subtype="EXTERNAL" onReady={onReady}/>);
                 default:
                     return <Error></Error>
             }
@@ -94,8 +109,8 @@ export const Frame: FC = () => {
                 Создание транзакции
             </div>
             <div className={styles.pages}>
-                {/* { renderPages(step) } */}
-                <OrganizationRegistration context="SENDER" subtype="EXTERNAL" onReady={onReady}/>
+                <CurrentPage step={step} />
+                {/* <OrganizationRegistration context="SENDER" subtype="EXTERNAL" onReady={onReady}/> */}
             </div>
             <div className={styles.navigation}>
                 <div className={styles["navigation-left"]}>

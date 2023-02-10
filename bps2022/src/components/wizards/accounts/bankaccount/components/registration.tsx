@@ -8,14 +8,14 @@ import {
 } from 'antd';
 
 import { mock as currencymock } from '../../../transaction/components/sums/mock';
-import { mock as organizationmock } from '../../../organization/mock';
+import { mock as organizationsmock } from '../../../organization/mock';
 
 import styles from './registration.module.css';
 
 export type Props = {
     context: "SENDER" | "RECEIVER" | "NONE",
     subtype: "INTERNAL" | "EXTERNAL",
-    onReady: (params: Params) => void,
+    onReady: (params: Params, registration: boolean) => void,
 };
 export type Params = {
     primaryno: string,
@@ -83,7 +83,7 @@ export const Registration: FC<Props> = ({ context, subtype, onReady }) => {
     }
 
     useEffect(() => {
-        validate(params) && onReady(params);
+        validate(params) && onReady(params, !params.notinlist);
     }, [params])
 
     return (
@@ -138,13 +138,13 @@ export const Registration: FC<Props> = ({ context, subtype, onReady }) => {
                 <label>Организация:</label>
             </div>
             <div className={styles["organizations-list-search"]}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} placeholder="Введите цифры для поиска по посдедним цифрам) по ИНН" onChange={onSearch}/>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} placeholder="Введите цифры для поиска по ИНН" onChange={onSearch}/>
             </div>
             <ul className={styles["organizations-list"]}>
             {
-                organizationmock
+                organizationsmock
                     .filter(item => (subtype === "EXTERNAL" && item.external === true) || (subtype === "INTERNAL" && item.external === false))
-                    .filter(item => (search.length > 0 && search === item.inn.slice(0 - search.length)))
+                    .filter(item => (search.length > 3 && item.inn.includes(search)))
                     .sort((a, b) => (a.organization < b.organization)? -1: 1)
                     .map(item =>
                         <li className={[styles["organizations-item"], params.organizationid === item.id? (params.notinlist? "": styles["organizations-item-current"]): "", params.notinlist? styles["organizations-not-inlist"]: ""].join(" ")} key={item.id} value={item.id} onClick={() => onOrganization(item.id)}>

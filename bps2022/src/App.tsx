@@ -71,7 +71,7 @@ const items2: MenuProps['items'] = [UserOutlined, LaptopOutlined, NotificationOu
       label: `subnav ${key}`,
 
       children: new Array(4).fill(null).map((_, j) => {
-        const subKey = index * 4 + j + 1;
+        const subKey: number = index * 4 + j + 1;
         return {
           key: subKey,
           label: `option${subKey}`,
@@ -131,7 +131,7 @@ const App: React.FC = () => (
       </Layout>
     </Layout>
   </Layout>
-  </div>
+</div>
 );
 
 export default App;

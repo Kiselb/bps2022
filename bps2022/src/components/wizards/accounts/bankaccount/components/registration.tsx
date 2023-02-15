@@ -15,9 +15,11 @@ import styles from './registration.module.css';
 export type Props = {
     context: "SENDER" | "RECEIVER" | "NONE",
     subtype: "INTERNAL" | "EXTERNAL",
-    onReady: (params: Params, registration: boolean) => void,
+    savedstate: State | null,
+    onReady: (state: State, registration: boolean) => void,
 };
-export type Params = {
+export type State = {
+    type: "REGBANKACCOUNT",
     primaryno: string,
     secondaryno: string,
     bankname: string,
@@ -28,63 +30,68 @@ export type Params = {
     notinlist: boolean,
 };
 
-const validate = (params: Params) => {
+const validate = (state: State) => {
     return (
         true
-        && params.primaryno.length > 0
-        && params.secondaryno.length > 0
-        && params.bankname.length > 0
-        && params.bik.length > 0
-        && params.city.length > 0
-        && params.currency.length > 0
-        && (params.notinlist || (!params.notinlist && params.organizationid > 0))
+        && state.primaryno.length > 0
+        && state.secondaryno.length > 0
+        && state.bankname.length > 0
+        && state.bik.length > 0
+        && state.city.length > 0
+        && state.currency.length > 0
+        && (state.notinlist || (!state.notinlist && state.organizationid > 0))
     );
 };
 
-export const Registration: FC<Props> = ({ context, subtype, onReady }) => {
-    const [params, setParams] = useState<Params>({
-        primaryno: "",
-        secondaryno: "",
-        bankname: "",
-        bik: "",
-        city: "",
-        currency: "RUB",
-        organizationid: 0,
-        notinlist: false,
-    })
+export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady }) => {
+    const [state, setState] = useState<State>(
+        savedstate === null?
+        {
+            type: "REGBANKACCOUNT",
+            primaryno: "",
+            secondaryno: "",
+            bankname: "",
+            bik: "",
+            city: "",
+            currency: "RUB",
+            organizationid: 0,
+            notinlist: false,
+        }
+        : { ...savedstate }
+    );
     const [search, setSearch] = useState<string>("");
 
     const onPrimaryNo = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setParams(params => ({ ...params, primaryno: event.target.value}));
+        setState(state => ({ ...state, primaryno: event.target.value}));
     }
     const onSecondaryNo = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setParams(params => ({ ...params, secondaryno: event.target.value}));
+        setState(state => ({ ...state, secondaryno: event.target.value}));
     }
     const onBankName = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setParams(params => ({ ...params, bankname: event.target.value}));
+        setState(state => ({ ...state, bankname: event.target.value}));
     }
     const onBIK = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setParams(params => ({ ...params, bik: event.target.value}));
+        setState(state => ({ ...state, bik: event.target.value}));
     }
     const onCity = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setParams(params => ({ ...params, city: event.target.value}));
+        setState(state => ({ ...state, city: event.target.value}));
     }
     const onCurrency = (value: string) => {
-        setParams(params => ({ ...params, primaryno: value}));
+        setState(state => ({ ...state, primaryno: value}));
     }
     const onInlist = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setParams(params => ({ ...params, notinlist: event.target.checked}));
+        setState(state => ({ ...state, notinlist: event.target.checked}));
     }
     const onOrganization = (id: number) => {
-        setParams(params => ({ ...params, organizationid: id}));
+        setState(state => ({ ...state, organizationid: id}));
     }
     const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(event.target.value);
     }
 
     useEffect(() => {
-        validate(params) && onReady(params, !params.notinlist);
-    }, [params])
+        validate(state) && onReady({ ...state }, state.notinlist);
+    }, [state])
 
     return (
         <div className={styles.page}>
@@ -95,31 +102,31 @@ export const Registration: FC<Props> = ({ context, subtype, onReady }) => {
                 <label>Расчётный счёт:</label>
             </div>
             <div className={styles.primaryno}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onPrimaryNo} defaultValue="" value={params.primaryno}/>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onPrimaryNo} defaultValue="" value={state.primaryno}/>
             </div>
             <div className={styles["secondaryno-label"]}>
                 <label>Корреспондирующий:</label>
             </div>
             <div className={styles.secondaryno}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onSecondaryNo} defaultValue="" value={params.secondaryno}/>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onSecondaryNo} defaultValue="" value={state.secondaryno}/>
             </div>
             <div className={styles["bankname-label"]}>
                 <label>Название банка:</label>
             </div>
             <div className={styles.bankname}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onBankName} defaultValue="" value={params.bankname}/>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onBankName} defaultValue="" value={state.bankname}/>
             </div>
             <div className={styles["bik-label"]}>
                 <label>БИК:</label>
             </div>
             <div className={styles.bik}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onBIK} defaultValue="" value={params.bik}/>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onBIK} defaultValue="" value={state.bik}/>
             </div>
             <div className={styles["city-label"]}>
                 <label>Город:</label>
             </div>
             <div className={styles.city}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onCity} defaultValue="" value={params.city}/>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onCity} defaultValue="" value={state.city}/>
             </div>
             <div className={styles["currency-label"]}>
                 <label>Валюта:</label>
@@ -147,7 +154,7 @@ export const Registration: FC<Props> = ({ context, subtype, onReady }) => {
                     .filter(item => (search.length > 3 && item.inn.includes(search)))
                     .sort((a, b) => (a.organization < b.organization)? -1: 1)
                     .map(item =>
-                        <li className={[styles["organizations-item"], params.organizationid === item.id? (params.notinlist? "": styles["organizations-item-current"]): "", params.notinlist? styles["organizations-not-inlist"]: ""].join(" ")} key={item.id} value={item.id} onClick={() => onOrganization(item.id)}>
+                        <li className={[styles["organizations-item"], state.organizationid === item.id? (state.notinlist? "": styles["organizations-item-current"]): "", state.notinlist? styles["organizations-not-inlist"]: ""].join(" ")} key={item.id} value={item.id} onClick={() => onOrganization(item.id)}>
                             <div>
                                 {item.inn}
                             </div>

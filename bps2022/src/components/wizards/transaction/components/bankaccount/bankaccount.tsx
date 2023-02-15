@@ -9,20 +9,38 @@ type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
     direction: -1 | 1,
     primary: boolean,
-    onReady: (id: number, registration: boolean) => void,
+    savedstate: State | null,
+    onReady: (state: State, registration: boolean) => void,
 };
-export const BankAccount: FC<Props> = ({ subtype, direction, onReady }: Props) => {
-    const [state, setState] = useState<{ id: number, notinlist: boolean }>({ id: -1, notinlist: false });
+export type State = {
+    type: "BANKACCOUNT",
+    accountid: number,
+    notinlist: boolean,    
+};
+const validate = (state: State): boolean => {
+    return ((state.notinlist) || (!state.notinlist && state.accountid > 0));
+};
 
-    const onCurrency = (id: number) => {
-        setState(state => ({ ...state, id }));
+export const BankAccount: FC<Props> = ({ subtype, direction, savedstate, onReady }: Props) => {
+    const [state, setState] = useState<State>(
+        savedstate === null?
+        {
+            type: "BANKACCOUNT",
+            accountid: -1,
+            notinlist: false
+        }
+        : { ...savedstate }
+    );
+
+    const onCurrency = (accountid: number) => {
+        setState(state => ({ ...state, accountid }));
     };
     const onChangeInList = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, notinlist: event.target.checked }));
     };
 
     useEffect(() => {
-        onReady(state.id, state.notinlist);
+        validate(state) && onReady({ ...state }, state.notinlist);
     }, [state]);
 
     return (
@@ -40,7 +58,7 @@ export const BankAccount: FC<Props> = ({ subtype, direction, onReady }: Props) =
                         .filter(item => (subtype === "EXTERNAL" && item.external === true) || (subtype === "INTERNAL" && item.external === false))
                         .sort((a, b) => (a.organization < b.organization)? -1: 1)
                         .map(item =>
-                            <li className={[styles["accounts-item"], state.id === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.account} onClick={() => onCurrency(item.id)}>
+                            <li className={[styles["accounts-item"], state.accountid === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.account} onClick={() => onCurrency(item.id)}>
                                 <div>
                                     {item.account}
                                 </div>
@@ -51,9 +69,9 @@ export const BankAccount: FC<Props> = ({ subtype, direction, onReady }: Props) =
                 }
             </ul>
             <div className={styles["accounts-not-in-list"]}>
-                <input type="checkbox" onChange={onChangeInList}></input>
+                <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
                 <div>Счёт в списке отсутствует</div>
             </div>
         </div>
     );
-}
+};

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 
 import { TransactionTypesIdentity } from '../../../../../domain/automaton/automaton';
 
@@ -6,13 +6,26 @@ import styles from './confirmation.module.css';
 
 type Props = {
     transaction: TransactionTypesIdentity | null,
-    onConfirm: (confirmed: boolean) => void,
+    onReady: (state: State, registration: boolean) => void,
+};
+export type State = {
+    type: "CONFIRMATION",
+    confirmed: boolean,
 };
 
-export const Confirmation: FC<Props> = ({ onConfirm }) => {
+export const Confirmation: FC<Props> = ({ onReady }) => {
+    const [state, setState] = useState<State>({
+        type: "CONFIRMATION",
+        confirmed: false,
+    });
     const onUserConfirm = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onConfirm((event.target.checked));
-    }
+        setState(state => ({...state, confirmed: event.target.checked }));
+    };
+
+    useEffect(() => {
+        onReady({ ...state }, false);
+    }, [state]);
+
     return (
         <div className={styles.page}>
             <div className={styles.header}>

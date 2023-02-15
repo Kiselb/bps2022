@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 
 import { LockOutlined } from '@ant-design/icons';
 import {
@@ -14,14 +14,11 @@ import { mock } from './mock';
 
 type Props = {
     exchange: boolean,
-    onOriginSum: (sum: number) => void,
-    onTargetSum: (sum: number) => void,
-    onOriginCurrency: (currency: string) => void,
-    onTargetCurrency: (currency: string) => void,
-    onRate: (rate: number) => void,
-    onExchange: (exchange: boolean) => void,
+    savedstate: State | null,
+    onReady: (state: State, registration: boolean) => void,
 };
-type state = {
+export type State = {
+    type: "SUMEXCHANGE",
     origin_sum: string,
     target_sum: string,
     origin_currency: string,
@@ -38,15 +35,20 @@ function isDecimal(value: string) {
     return (value.match(/[+-]?([0-9]*[.])?[0-9]+/) && !isNaN(+value));
 }
 
-export const Sums: FC<Props> = ({ exchange, onOriginSum, onTargetSum, onOriginCurrency, onTargetCurrency, onRate, onExchange }: Props) => {
-    const [sums, setSums] = useState<state>({
-        origin_sum: "0.00",
-        target_sum: "0.00",
-        origin_currency: "RUB",
-        target_currency: "RUB",
-        rate: "1.00",
-        exchange: false,
-    });
+export const Sums: FC<Props> = ({ exchange, savedstate, onReady }: Props) => {
+    const [state, setState] = useState<State>(
+        savedstate === null?
+        {
+            type: "SUMEXCHANGE",
+            origin_sum: "0.00",
+            target_sum: "0.00",
+            origin_currency: "RUB",
+            target_currency: "RUB",
+            rate: "1.00",
+            exchange: false,
+        }
+        : { ...savedstate }
+    );
     const handleOriginCurrency = (value: string) => {
         console.log(`selected ${value}`);
     };
@@ -56,20 +58,24 @@ export const Sums: FC<Props> = ({ exchange, onOriginSum, onTargetSum, onOriginCu
     const handleSumMain = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(isDecimal(event.target.value));
         if (isDecimal(event.target.value)) {
-            setSums(value => ({ ...value, origin_sum: event.target.value }));
+            setState(value => ({ ...value, origin_sum: event.target.value }));
         } else {
-            setSums(value => ({ ...value}));
+            setState(value => ({ ...value}));
         }
     };
 
-      return (
+    useEffect(() => {
+        onReady({ ...state }, false);
+    }, [state]);
+
+    return (
         <div className={styles.page}>
             <div className={styles.header}>
                 Суммы транзакции
             </div>
             <div className={styles["sums-origin"]}>
                 <Input.Group compact>
-                    <Input style={{ width: '20rem', fontSize: "1.5rem", height: "2.75rem", textAlign: "right" }} onChange={handleSumMain} defaultValue="0.00" value={sums.origin_sum}/>
+                    <Input style={{ width: '20rem', fontSize: "1.5rem", height: "2.75rem", textAlign: "right" }} onChange={handleSumMain} defaultValue="0.00" value={state.origin_sum}/>
                     <div style={{ height: "2.75rem", border: "1px solid rgb(217,217,217)", width: "5rem" }}>
                         <Select
                             size="large"
@@ -117,4 +123,4 @@ export const Sums: FC<Props> = ({ exchange, onOriginSum, onTargetSum, onOriginCu
             }
         </div>
     );
-}
+};

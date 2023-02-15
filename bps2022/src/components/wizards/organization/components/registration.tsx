@@ -13,53 +13,60 @@ import styles from './registration.module.css';
 export type Props = {
     context: "SENDER" | "RECEIVER" | "NONE",
     subtype: "INTERNAL" | "EXTERNAL",
-    onReady: (params: Params) => void,
+    savedstate: State | null,
+    onReady: (state: State, registration: boolean) => void,
 };
-export type Params = {
+export type State = {
+    type: "REGORGANIZATION",
     name: string,
     inn: string,
     kpp: string,
     clientid: number,
 };
 
-const validate = (params: Params, subtype: "INTERNAL" | "EXTERNAL") => {
+const validate = (state: State, subtype: "INTERNAL" | "EXTERNAL") => {
     return (
         true
-        && params.name.length > 0
-        && params.inn.length > 0
-        && params.kpp.length > 0
-        && (subtype === "INTERNAL" && params.clientid === 0 || subtype === "EXTERNAL" && params.clientid > 0)
+        && state.name.length > 0
+        && state.inn.length > 0
+        && state.kpp.length > 0
+        && (subtype === "INTERNAL" && state.clientid === 0 || subtype === "EXTERNAL" && state.clientid > 0)
     );
 };
 
-export const Registration: FC<Props> = ({ context, subtype, onReady }) => {
-    const [params, setParams] = useState<Params>({
-        name: "",
-        inn: "",
-        kpp: "",
-        clientid: 0,
-    });
+export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady }) => {
+    const [state, setState] = useState<State>(
+        savedstate === null?
+        {
+            type: "REGORGANIZATION",
+            name: "",
+            inn: "",
+            kpp: "",
+            clientid: 0,
+        }
+        : { ...savedstate }
+    );
     const [search, setSearch] = useState<string>("");
 
     const onName = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setParams(params => ({ ...params, name: event.target.value }));
+        setState(state => ({ ...state, name: event.target.value }));
     }
     const onINN = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setParams(params => ({ ...params, inn: event.target.value }));
+        setState(state => ({ ...state, inn: event.target.value }));
     }
     const onKPP = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setParams(params => ({ ...params, kpp: event.target.value }));
+        setState(state => ({ ...state, kpp: event.target.value }));
     }
     const onClient = (clientid: number) => {
-        setParams(params => ({ ...params, clientid }))
+        setState(state => ({ ...state, clientid }))
     }
     const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(event.target.value);
     }
 
     useEffect(() => {
-        validate(params, subtype) && onReady(params)
-    }, [params])
+        validate(state, subtype) && onReady({ ...state }, false);
+    }, [state])
 
     return (
         <div className={styles.page}>
@@ -70,19 +77,19 @@ export const Registration: FC<Props> = ({ context, subtype, onReady }) => {
                 <label>Название:</label>
             </div>
             <div className={styles.name}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onName} defaultValue="" value={params.name}/>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onName} defaultValue="" value={state.name}/>
             </div>
             <div className={styles["inn-label"]}>
                 <label>ИНН:</label>
             </div>
             <div className={styles.inn}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onINN} defaultValue="" value={params.inn}/>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onINN} defaultValue="" value={state.inn}/>
             </div>
             <div className={styles["kpp-label"]}>
                 <label>КПП:</label>
             </div>
             <div className={styles.kpp}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onKPP} defaultValue="" value={params.kpp}/>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onKPP} defaultValue="" value={state.kpp}/>
             </div>
             {
                 subtype === "EXTERNAL"?
@@ -99,7 +106,7 @@ export const Registration: FC<Props> = ({ context, subtype, onReady }) => {
                                     .filter(item => search.length > 0 && item.name.toUpperCase().includes(search.toUpperCase()))
                                     .sort((a, b) => (a.name < b.name)? -1: 1)
                                     .map(item =>
-                                        <li className={[styles["clients-item"], params.clientid === item.id? styles["clients-item-current"]: ""].join(" ")} key={item.id} value={item.id} onClick={() => onClient(item.id)}>
+                                        <li className={[styles["clients-item"], state.clientid === item.id? styles["clients-item-current"]: ""].join(" ")} key={item.id} value={item.id} onClick={() => onClient(item.id)}>
                                             <div style={{ width: '13rem' }}>
                                                 {item.name}
                                             </div>

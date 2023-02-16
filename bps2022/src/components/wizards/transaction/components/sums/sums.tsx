@@ -7,7 +7,7 @@ import {
     Input,
     InputNumber,
     Select,
-  } from 'antd';
+} from 'antd';
 
 import styles from './sums.module.css';
 import { mock } from './mock';

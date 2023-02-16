@@ -37,13 +37,13 @@ test('Тестирование автомата транзакций: налич
     }
     expect(result).toEqual(true);
 });
-test('Тестирование Identity шагов wizard (страниц)', () => {
+test('Тестирование консистентности Identity шагов wizard (страниц)', () => {
     let result = 0;
     for(let i = 0; i < automaton.length; i++) {
         const pages = automaton[i][3];
         if (pages !== null) {
             for(let j = 0; j < pages.length; j++) {
-                const keys = Object.keys(pages[j]).filter(key => key !== "type").filter(key => key !== "identity").sort();
+                const keys = Object.keys(pages[j]).filter(key => key !== "type").filter(key => key !== "identity").filter(key => key !== "marker").filter(key => key !== "fee").filter(key => key !== "charge").sort();
                 let identity = "TYPE:" + pages[j].type.toUpperCase();
                 for(let k = 0; k < keys.length; k++) {
                     identity += ";" + keys[k].toUpperCase() + ":" + pages[j][keys[k] as keyof WizardPagesTypesUnion].toString().toUpperCase();

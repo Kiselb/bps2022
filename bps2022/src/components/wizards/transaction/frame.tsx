@@ -4,6 +4,7 @@ import { QuestionOutlined, LeftOutlined, RightOutlined, CheckOutlined, UndoOutli
 import { TransactionTypesIdentity, TransactionGroupSelector, WizardPagesTypesUnion, automaton, isRegularPage } from '../../../domain/automaton/automaton';
 
 import { Selector } from './components/selector/selector';
+import { Roadmap } from './components/roadmap/roadmap';
 import { State as BankAccountState, BankAccount } from './components/bankaccount/bankaccount';
 import { State as CashAccountState, CashAccount } from './components/cashaccount/cashaccount';
 import { State as PersonalAccountState, PersonalAccount } from './components/personalaccount/personalaccount';
@@ -43,17 +44,12 @@ export const Frame: FC = () => {
             queue: [],
         }
     );
-
-    //const regnext = useRef<boolean>(false);
-    //const validated = useRef<boolean>(true);
     const pagesstate = useRef({
         regnext: false,
         validated: true,
         storage: new Map(),
         history: [-2],
     });
-    //const history = useRef([-2]);
-
     const onOrigin = (origin: string) => {
         setState(state => ({...state, selection: {...state.selection, origin: origin as TransactionGroupSelector }}));
     };
@@ -91,6 +87,9 @@ export const Frame: FC = () => {
         if (pagesstate.current.history.length > 1) {
             pagesstate.current.history.pop();
             setState(state => ({...state, step: pagesstate.current.history[pagesstate.current.history.length - 1] }));
+            if (pagesstate.current.history[pagesstate.current.history.length - 1] === -2) {
+                setState(state => ({...state, queue: [] }));
+            }
         }
     };
     const onReady = (pagestate:
@@ -136,7 +135,7 @@ export const Frame: FC = () => {
                 case "OVERDRAFT":
                     return null;
                 case "SERVICECHARGE":
-                    return (<ServiceCharge onReady={onReady}/>);
+                    return (<ServiceCharge wizard={state.queue} onReady={onReady}/>);
                 case "ARTICLE":
                     return (<Article subtype={page.subtype} savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
                 case "CONFIRMATION":
@@ -164,6 +163,9 @@ export const Frame: FC = () => {
         <div className={styles.frame}>
             <div className={styles.header}>
                 Создание транзакции
+            </div>
+            <div className={styles.roadmap}>
+                <Roadmap wizard={state.queue} current={state.step}/>
             </div>
             <div className={styles.pages}>
                 <CurrentPage state={state} />

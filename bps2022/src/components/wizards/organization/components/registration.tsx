@@ -21,6 +21,7 @@ export type State = {
     name: string,
     inn: string,
     kpp: string,
+    ogrn: string,
     clientid: number,
 };
 
@@ -30,6 +31,7 @@ const validate = (state: State, subtype: "INTERNAL" | "EXTERNAL") => {
         && state.name.length > 0
         && state.inn.length > 0
         && state.kpp.length > 0
+        && state.ogrn.length > 0
         && (subtype === "INTERNAL" && state.clientid === 0 || subtype === "EXTERNAL" && state.clientid > 0)
     );
 };
@@ -42,6 +44,7 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady 
             name: "",
             inn: "",
             kpp: "",
+            ogrn: "",
             clientid: 0,
         }
         : { ...savedstate }
@@ -50,23 +53,26 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady 
 
     const onName = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, name: event.target.value }));
-    }
+    };
     const onINN = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, inn: event.target.value }));
-    }
+    };
     const onKPP = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, kpp: event.target.value }));
-    }
+    };
+    const onOGRN = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState(state => ({ ...state, ogrn: event.target.value }));
+    };
     const onClient = (clientid: number) => {
-        setState(state => ({ ...state, clientid }))
-    }
+        setState(state => ({ ...state, clientid }));
+    };
     const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearch(event.target.value);
-    }
+    };
 
     useEffect(() => {
         validate(state, subtype) && onReady({ ...state }, false);
-    }, [state])
+    }, [state]);
 
     return (
         <div className={styles.page}>
@@ -90,6 +96,12 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady 
             </div>
             <div className={styles.kpp}>
                 <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onKPP} defaultValue="" value={state.kpp}/>
+            </div>
+            <div className={styles["ogrn-label"]}>
+                <label>ОГРН:</label>
+            </div>
+            <div className={styles.ogrn}>
+                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onOGRN} defaultValue="" value={state.ogrn}/>
             </div>
             {
                 subtype === "EXTERNAL"?

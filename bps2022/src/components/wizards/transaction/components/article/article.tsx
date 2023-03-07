@@ -8,15 +8,24 @@ import { mock } from './mock';
 type Props = {
     subtype: "INCOME" | "EXPENSES",
     savedstate: State | null,
+    regallowed: boolean,
     onReady: (state: State, registration: boolean) => void,
+    onDirty: (state: State) => void,
 };
 export type State = {
     type: "ARTICLE",
     articleid: number,
     notinlist: boolean,
-};    
+};
 
-export const Article: FC<Props> = ({ subtype, savedstate, onReady }: Props) => {
+const validate = (state: State) => {
+    return (
+        true
+        && (state.notinlist || state.articleid > 0)
+    );
+};
+
+export const Article: FC<Props> = ({ subtype, savedstate, regallowed, onReady, onDirty }: Props) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -35,7 +44,7 @@ export const Article: FC<Props> = ({ subtype, savedstate, onReady }: Props) => {
     }
 
     useEffect(() => {
-        onReady({ ...state }, state.notinlist);
+        validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
     }, [state]);
 
     return (
@@ -60,10 +69,14 @@ export const Article: FC<Props> = ({ subtype, savedstate, onReady }: Props) => {
                             </li>)
                 }
             </ul>
-            <div className={styles["articles-not-in-list"]}>
-                <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
-                <div>Статья в списке отсутствует</div>
-            </div>
+            {
+                regallowed?
+                    <div className={styles["articles-not-in-list"]}>
+                        <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
+                        <div>Статья в списке отсутствует</div>
+                    </div>
+                    : null
+            }
         </div>
     );
 };

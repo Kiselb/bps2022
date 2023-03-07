@@ -1,12 +1,12 @@
 import React, { FC, useState, useEffect } from 'react';
 
+import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
-import styles from './cashaccount.module.css';
 import { mock } from './mock';
+import styles from './cofferaccount.module.css';
 
 type Props = {
-    subtype: "INTERNAL" | "EXTERNAL",
     direction: -1 | 1,
     primary: boolean,
     regallowed: boolean,
@@ -15,21 +15,23 @@ type Props = {
     onDirty: (state: State) => void,
 };
 export type State = {
-    type: "CASHACCOUNT",
+    type: "COFFERACCOUNT",
     accountid: number,
     notinlist: boolean,
+    search: string,
 };
 const validate = (state: State): boolean => {
-    return ((state.notinlist) || (!state.notinlist &&  state.accountid > 0));
+    return ((state.notinlist) || (!state.notinlist && state.accountid > 0));
 };
 
-export const CashAccount: FC<Props> = ({ subtype, direction, savedstate, regallowed, onReady, onDirty }: Props) => {
+export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, onReady, onDirty}) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
-            type: "CASHACCOUNT",
-            accountid: -1,
+            type: "COFFERACCOUNT",
+            accountid: 0,
             notinlist: false,
+            search: "",
         }
         : { ...savedstate }
     );
@@ -40,6 +42,9 @@ export const CashAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
     const onChangeInList = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, notinlist: event.target.checked }));
     };
+    const onChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState(state => ({ ...state, accountid: 0, search: event.target.value }));
+    };
 
     useEffect(() => {
         validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
@@ -48,18 +53,25 @@ export const CashAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (direction === 1? "Приём: ": "Отправка: ") + (subtype === "INTERNAL"? "Кассовые счета организации": "Кассовые счета внешние") }
+                { (direction === 1? "Приём: ": "Отправка: ") + "Ячейка организации"}
             </div>
             <div className={styles.search}>
-                <input type="text" placeholder='Поиск'></input>
-                <div><SearchOutlined/></div>
+                <Input
+                    prefix={<SearchOutlined style={{ fontSize: "1.25rem", paddingRight: "0.5rem"}}/>}
+                    style={{ fontFamily: 'Roboto', fontSize: "1rem", width: '100%' }}
+                    placeholder="Введите текста для выбора ячейки"
+                    allowClear
+                    value={state.search}
+                    onChange={onChangeSearch}
+                />
             </div>
-            <ul className={styles["accounts-list"]}>
+            <ul className={styles["coffers-list"]}>
                 {
                     mock
+                        .filter(item => state.search.length !== 0 && item.name.includes(state.search))
                         .sort((a, b) => (a.name < b.name)? -1: 1)
                         .map(item =>
-                            <li className={[styles["accounts-item"], state.accountid === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.name} onClick={() => onCurrency(item.id)}>
+                            <li className={[styles["coffers-item"], state.accountid === item.id? styles["coffers-item-current"]: ""].join(" ")} key={item.id} value={item.name} onClick={() => onCurrency(item.id)}>
                                 <div>
                                     {item.name}
                                 </div>
@@ -68,9 +80,9 @@ export const CashAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
             </ul>
             {
                 regallowed?
-                    <div className={styles["accounts-not-in-list"]}>
+                    <div className={styles["coffers-not-in-list"]}>
                         <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
-                        <div>Счёт в списке отсутствует</div>
+                        <div>Ячейка в списке отсутствует</div>
                     </div>
                     : null
             }

@@ -1,12 +1,32 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 
 import styles from './registration.module.css';
 
-type Props = {
-    onReady: (name: string) => void,
+export type State = {
+    accountname: string
 };
 
-export const Registration: FC<Props> = ({ onReady }) => {
+type Props = {
+    onReady: (state: State) => void,
+    onDirty: (state: State) => void,
+};
+
+const validate = (state: State) => {
+    return (
+        true
+        && state.accountname.length > 7 
+    );
+};
+
+export const Registration: FC<Props> = ({ onReady, onDirty }) => {
+    const [state, setState] = useState<State>({
+        accountname: "",
+    });
+
+    useEffect(() => {
+        validate(state)? onReady({ ...state }): onDirty({ ...state });
+    }, [state]);
+
     return (
         <div>
 

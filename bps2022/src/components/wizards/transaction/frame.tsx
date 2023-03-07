@@ -9,6 +9,9 @@ import { State as BankAccountState, BankAccount } from './components/bankaccount
 import { State as CashAccountState, CashAccount } from './components/cashaccount/cashaccount';
 import { State as PersonalAccountState, PersonalAccount } from './components/personalaccount/personalaccount';
 import { State as ExternalAccountState, ExternalAccount } from './components/externalaccount/externalaccount';
+import { State as LendingAccountState, LendingAccount } from './components/lendingaccount/lendingaccount';
+import { State as CofferAccountState, CofferAccount } from './components/cofferaccount/cofferaccount';
+import { State as OverdraftState, Overdraft } from './components/overdraft/overdraft';
 import { Narrowing } from './components/narrowing/narrowing';
 import { State as SumsState, Sums } from './components/sums/sums';
 import { State as ConfirmationState, Confirmation } from './components/confirmation/confirmation';
@@ -18,6 +21,8 @@ import { Error } from './components/error/error';
 
 import { State as BankAccountRegistrationState, Registration as BankAccountRegistration } from '../../wizards/accounts/bankaccount/components/registration';
 import { State as OrganizationRegistrationState, Registration as OrganizationRegistration } from '../../wizards/organization/components/registration';
+import { State as PersonalAccountRegistrationState, Registration as PersonalAccountRegistration } from '../clients/components/registration';
+import { State as OverdraftRegistrationState, Registration as OverdraftRegistration } from '../../wizards/accounts/overdraft/components/registration';
 import { State as ArticleRegistrationState, Registration as ArticleRegistration } from '../../wizards/article/registration';
 
 import styles from './frame.module.css';
@@ -50,6 +55,13 @@ export const Frame: FC = () => {
         storage: new Map(),
         history: [-2],
     });
+
+    const getAutomatonParameter = (identity: string, parameter: string): number | null => {
+        const parameters = pagesstate.current.storage.get(identity);
+        if (parameter in parameters) return parameters[parameter];
+        return null;
+    };
+    
     const onOrigin = (origin: string) => {
         setState(state => ({...state, selection: {...state.selection, origin: origin as TransactionGroupSelector }}));
     };
@@ -96,11 +108,16 @@ export const Frame: FC = () => {
         | BankAccountState
         | BankAccountRegistrationState
         | OrganizationRegistrationState
+        | PersonalAccountRegistrationState
+        | OverdraftRegistrationState
         | ArticleRegistrationState
         | SumsState
         | CashAccountState
         | PersonalAccountState
+        | LendingAccountState
         | ExternalAccountState
+        | CofferAccountState
+        | OverdraftState
         | ArticleState
         | ConfirmationState
         | ServiceChargeState
@@ -109,43 +126,212 @@ export const Frame: FC = () => {
         pagesstate.current.validated = true;
         pagesstate.current.storage.set(state.queue[state.step].identity, {...pagestate});
     };
+    const onDirty = (pagestate:
+        | BankAccountState
+        | BankAccountRegistrationState
+        | OrganizationRegistrationState
+        | PersonalAccountRegistrationState
+        | OverdraftRegistrationState
+        | ArticleRegistrationState
+        | SumsState
+        | CashAccountState
+        | PersonalAccountState
+        | LendingAccountState
+        | ExternalAccountState
+        | CofferAccountState
+        | OverdraftState
+        | ArticleState
+        | ConfirmationState
+        | ServiceChargeState) => {
+        pagesstate.current.validated = false;
+        pagesstate.current.storage.set(state.queue[state.step].identity, {...pagestate});
+    };
 
     const CurrentPage: FC<{ state: State }> = ({ state }) => {
         if (state.step === -2) {
-            return (<Selector onOrigin={onOrigin} onTarget={onTarget} origin={state.selection.origin} target={state.selection.target}/>);
+            return (
+                <Selector
+                    onOrigin={onOrigin}
+                    onTarget={onTarget}
+                    origin={state.selection.origin}
+                    target={state.selection.target}
+                />
+            );
         } else if (state.step === -1) {
-            return (<Narrowing origin={state.selection.origin} target={state.selection.target} transaction={state.transactionid} onTransaction={onTransaction}/>);
+            return (
+                <Narrowing
+                    origin={state.selection.origin}
+                    target={state.selection.target}
+                    transaction={state.transactionid}
+                    onTransaction={onTransaction}
+                />
+            );
         } else {
             const page = state.queue[state.step];
             switch (page.type) {
                 case "SUMEXCHANGE":
-                    return (<Sums exchange={page.exchange} savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
+                    return (
+                        <Sums
+                            exchange={page.exchange}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                        />
+                    );
                 case "BANKACCOUNT":
-                    return (<BankAccount primary={page.primary} subtype={page.subtype} direction={page.direction} savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
+                    return (
+                        <BankAccount
+                            primary={page.primary}
+                            subtype={page.subtype}
+                            direction={page.direction}
+                            regallowed={page.registration}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "CASHACCOUNT":
-                    return (<CashAccount primary={page.primary} subtype={page.subtype} direction={page.direction} savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
+                    return (
+                        <CashAccount
+                            primary={page.primary}
+                            subtype={page.subtype}
+                            direction={page.direction}
+                            regallowed={page.registration}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "PERSONALACCOUNT":
-                    return (<PersonalAccount primary={page.primary} subtype={page.subtype} direction={page.direction} savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
+                    return (
+                        <PersonalAccount
+                            primary={page.primary}
+                            subtype={page.subtype}
+                            direction={page.direction}
+                            regallowed={page.registration}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "LENDINGACCOUNT":
-                    return null;
+                    return (
+                        <LendingAccount
+                            primary={page.primary}
+                            clientid={getAutomatonParameter("PERSONALACCOUNT", "accountid")}
+                            direction={page.direction}
+                            regallowed={page.registration}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "EXTERNALACCOUNT":
-                    return (<ExternalAccount primary={page.primary} subtype={page.subtype} direction={page.direction} savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
+                    return (
+                        <ExternalAccount
+                            primary={page.primary}
+                            subtype={page.subtype}
+                            direction={page.direction}
+                            regallowed={page.registration}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "COFFERACCOUNT":
-                    return null;
+                    return (
+                        <CofferAccount
+                            primary={page.primary}
+                            direction={page.direction}
+                            regallowed={page.registration}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "OVERDRAFT":
-                    return null;
+                    return (
+                        <Overdraft
+                            primary={page.primary}
+                            direction={page.direction}
+                            regallowed={page.registration}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "SERVICECHARGE":
-                    return (<ServiceCharge wizard={state.queue} onReady={onReady}/>);
+                    return (
+                        <ServiceCharge
+                            wizard={state.queue}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "ARTICLE":
-                    return (<Article subtype={page.subtype} savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
+                    return (
+                        <Article
+                            subtype={page.subtype}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            regallowed={page.registration}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "CONFIRMATION":
-                    return (<Confirmation transaction={state.transactionid} onReady={onReady}/>);
+                    return (
+                        <Confirmation
+                            transaction={state.transactionid}
+                            onReady={onReady}
+                        />
+                    );
                 case "REGBANKACCOUNT":
-                    return (<BankAccountRegistration context={page.direction === -1? "SENDER": "RECEIVER"} subtype="EXTERNAL" savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
+                    return (
+                        <BankAccountRegistration
+                            context={page.direction === -1? "SENDER": "RECEIVER"}
+                            subtype={page.subtype}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "REGORGANIZATION":
-                    return (<OrganizationRegistration context={page.direction === -1? "SENDER": "RECEIVER"} subtype="EXTERNAL" savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
+                    return (
+                        <OrganizationRegistration
+                            context={page.direction === -1? "SENDER": "RECEIVER"}
+                            subtype={page.subtype}
+                            client={page.client}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
+                case "REGPERSONALACCOUNT":
+                    return (
+                        <PersonalAccountRegistration
+                            context={page.direction === -1? "SENDER": "RECEIVER"}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
+                case "REGOVERDRAFT":
+                    return (
+                        <OverdraftRegistration 
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 case "REGARTICLE":
-                    return (<ArticleRegistration subtype={page.subtype} savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null} onReady={onReady}/>);
+                    return (
+                        <ArticleRegistration
+                            subtype={page.subtype}
+                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            onReady={onReady}
+                            onDirty={onDirty}
+                        />
+                    );
                 default:
                     return <Error></Error>
             }
@@ -162,7 +348,7 @@ export const Frame: FC = () => {
     return (
         <div className={styles.frame}>
             <div className={styles.header}>
-                Создание транзакции
+                Создание транзакции {state.step !== -2 && !!state.transactionid? "(" + automaton.filter(item => item[0] === state.transactionid)[0][0] + "): " : ""}{state.step !== -2 && !!state.transactionid? automaton.filter(item => item[0] === state.transactionid)[0][4]: ""}
             </div>
             <div className={styles.roadmap}>
                 <Roadmap wizard={state.queue} current={state.step}/>

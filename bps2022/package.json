@@ -12,6 +12,7 @@
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "antd": "^5.0.2",
+    "dayjs": "^1.11.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -46,6 +47,7 @@
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.28.0",
-    "eslint-plugin-react": "^7.31.11"
+    "eslint-plugin-react": "^7.31.11",
+    "postcss-normalize": "^10.0.1"
   }
 }

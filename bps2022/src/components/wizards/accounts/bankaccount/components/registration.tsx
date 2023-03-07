@@ -1,11 +1,6 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, CSSProperties } from 'react';
 
-import {
-    Button,
-    Checkbox,
-    Input,
-    Select,
-} from 'antd';
+import { Input, Select } from 'antd';
 
 import { mock as currencymock } from '../../../transaction/components/sums/mock';
 import { mock as organizationsmock } from '../../../organization/mock';
@@ -17,6 +12,7 @@ export type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
+    onDirty: (state: State) => void,
 };
 export type State = {
     type: "REGBANKACCOUNT",
@@ -28,6 +24,7 @@ export type State = {
     currency: string,
     organizationid: number,
     notinlist: boolean,
+    search: string,
 };
 
 const validate = (state: State) => {
@@ -43,7 +40,7 @@ const validate = (state: State) => {
     );
 };
 
-export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady }) => {
+export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady, onDirty }) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -56,11 +53,10 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady 
             currency: "RUB",
             organizationid: 0,
             notinlist: false,
+            search: "",
         }
         : { ...savedstate }
     );
-    const [search, setSearch] = useState<string>("");
-
     const onPrimaryNo = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, primaryno: event.target.value}));
     }
@@ -86,12 +82,14 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady 
         setState(state => ({ ...state, organizationid: id}));
     }
     const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(event.target.value);
+        setState(state => ({ ...state, search: event.target.value }));
     }
 
     useEffect(() => {
-        validate(state) && onReady({ ...state }, state.notinlist);
-    }, [state])
+        validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
+    }, [state]);
+
+    const styleinput: CSSProperties = { width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" };
 
     return (
         <div className={styles.page}>
@@ -102,31 +100,31 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady 
                 <label>Расчётный счёт:</label>
             </div>
             <div className={styles.primaryno}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onPrimaryNo} defaultValue="" value={state.primaryno}/>
+                <Input style={styleinput} onChange={onPrimaryNo} defaultValue="" value={state.primaryno}/>
             </div>
             <div className={styles["secondaryno-label"]}>
                 <label>Корреспондирующий:</label>
             </div>
             <div className={styles.secondaryno}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onSecondaryNo} defaultValue="" value={state.secondaryno}/>
+                <Input style={styleinput} onChange={onSecondaryNo} defaultValue="" value={state.secondaryno}/>
             </div>
             <div className={styles["bankname-label"]}>
                 <label>Название банка:</label>
             </div>
             <div className={styles.bankname}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onBankName} defaultValue="" value={state.bankname}/>
+                <Input style={styleinput} onChange={onBankName} defaultValue="" value={state.bankname}/>
             </div>
             <div className={styles["bik-label"]}>
                 <label>БИК:</label>
             </div>
             <div className={styles.bik}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onBIK} defaultValue="" value={state.bik}/>
+                <Input style={styleinput} onChange={onBIK} defaultValue="" value={state.bik}/>
             </div>
             <div className={styles["city-label"]}>
                 <label>Город:</label>
             </div>
             <div className={styles.city}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onCity} defaultValue="" value={state.city}/>
+                <Input style={styleinput} onChange={onCity} defaultValue="" value={state.city}/>
             </div>
             <div className={styles["currency-label"]}>
                 <label>Валюта:</label>
@@ -145,16 +143,16 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady 
                 <label>Организация:</label>
             </div>
             <div className={styles["organizations-list-search"]}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} placeholder="Введите цифры для поиска по ИНН" onChange={onSearch}/>
+                <Input style={styleinput} placeholder="Введите цифры для поиска по ИНН" onChange={onSearch} value={state.search}/>
             </div>
             <ul className={styles["organizations-list"]}>
             {
                 organizationsmock
                     .filter(item => (subtype === "EXTERNAL" && item.external === true) || (subtype === "INTERNAL" && item.external === false))
-                    .filter(item => (search.length > 3 && item.inn.includes(search)))
+                    .filter(item => (state.search.length > 3 && item.inn.includes(state.search)))
                     .sort((a, b) => (a.organization < b.organization)? -1: 1)
                     .map(item =>
-                        <li className={[styles["organizations-item"], state.organizationid === item.id? (state.notinlist? "": styles["organizations-item-current"]): "", state.notinlist? styles["organizations-not-inlist"]: ""].join(" ")} key={item.id} value={item.id} onClick={() => onOrganization(item.id)}>
+                        <li className={[styles["organizations-item"], state.organizationid === item.id? (state.notinlist? "": styles["organizations-item-current"]): "", state.notinlist? styles["organizations-disabled"]: ""].join(" ")} key={item.id} value={item.id} onClick={() => onOrganization(item.id)}>
                             <div>
                                 {item.inn}
                             </div>
@@ -165,7 +163,7 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady 
             }
             </ul>
             <div className={styles["organizations-not-in-list"]}>
-                <input type="checkbox" onChange={onInlist}></input>
+                <input type="checkbox" onChange={onInlist} checked={state.notinlist}/>
                 <div>Организация в списке отсутствует</div>
             </div>
         </div>

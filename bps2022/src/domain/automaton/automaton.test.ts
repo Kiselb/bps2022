@@ -43,14 +43,20 @@ test('Тестирование консистентности Identity шаго�
         const pages = automaton[i][3];
         if (pages !== null) {
             for(let j = 0; j < pages.length; j++) {
-                const keys = Object.keys(pages[j]).filter(key => key !== "type").filter(key => key !== "identity").filter(key => key !== "marker").filter(key => key !== "fee").filter(key => key !== "charge").sort();
+                const keys: string[] = [];
+                ("direction" in pages[j]) && keys.push("direction");
+                ("exchange" in pages[j]) && keys.push("exchange");
+                ("primary" in pages[j]) && keys.push("primary");
+                ("registration" in pages[j]) && keys.push("registration");
+                ("subtype" in pages[j]) && keys.push("subtype");
+
                 let identity = "TYPE:" + pages[j].type.toUpperCase();
                 for(let k = 0; k < keys.length; k++) {
                     identity += ";" + keys[k].toUpperCase() + ":" + pages[j][keys[k] as keyof WizardPagesTypesUnion].toString().toUpperCase();
                 }
                 if (pages[j].identity !== identity) {
                     result += 1;
-                    console.log(`Transaction: ${automaton[i][0]} Identity: ${identity}`);
+                    console.log(`Transaction: ${automaton[i][0]} Identity: ${pages[j].identity} Test Identity: ${identity}`);
                 }
             }
         }

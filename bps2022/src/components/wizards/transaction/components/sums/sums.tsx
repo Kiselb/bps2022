@@ -5,10 +5,10 @@ import {
     Button,
     Checkbox,
     Input,
-    InputNumber,
     Select,
 } from 'antd';
 
+import { isDecimal } from '../../../../../domain/utilities';
 import styles from './sums.module.css';
 import { mock } from './mock';
 
@@ -26,14 +26,6 @@ export type State = {
     rate: string,
     exchange: boolean,
 };
-
-function isNumeric(value: string) {
-    return !isNaN(+value) && !isNaN(parseFloat(value));
-}
-
-function isDecimal(value: string) {
-    return (value.match(/[+-]?([0-9]*[.])?[0-9]+/) && !isNaN(+value));
-}
 
 export const Sums: FC<Props> = ({ exchange, savedstate, onReady }: Props) => {
     const [state, setState] = useState<State>(

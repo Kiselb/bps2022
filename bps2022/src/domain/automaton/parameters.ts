@@ -30,7 +30,7 @@ type RegExternalAccount = {
     currency: string,
     clientid: number,
 }
-type TransactionParameters = {
+type TransactionParameters_V1 = {
     origin: {
         main: {
             type: string,
@@ -61,4 +61,28 @@ type TransactionParameters = {
             
         }
     },
-}
+};
+
+export type BankAccount = {
+    type: "BANKACCOUNT",
+    id: number,
+    name: string,
+};
+export type CashAccount = {
+    type: "CASHACCOUNT",
+    id: number,
+    name: string,
+};
+export type Operation = {
+    index: number,
+    sum: number,
+    dir: -1 | 1,
+};
+
+export type TransactionParameters = {
+    accounts: (BankAccount | CashAccount)[],
+    operations: Operation[],
+    origin: number | null,
+    target: number | null,
+    charges: string[],
+};

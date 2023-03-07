@@ -1,0 +1,81 @@
+.page {
+    display: grid;
+    grid-template-rows: auto auto auto auto auto 1fr;
+    grid-template-columns: auto 1fr;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 2rem;
+    font-family: 'Roboto';
+    font-size: 1rem;
+    row-gap: 0.25rem;   
+}
+.header {
+    grid-row-start: 1;
+    grid-row-end: 1;
+    grid-column-start: 1;
+    grid-column-end: span 2;
+    font-family: 'Roboto';
+    font-size: 1.5rem;
+    height: fit-content;
+    margin-bottom: 1rem;
+}
+.clients-name {
+    grid-row-start: 2;
+    grid-row-end: 2;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+.clients-name-label {
+    display: flex;
+    align-items: center;
+    grid-row-start: 2;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    width: 100%;
+    margin-right: 0.5rem;
+    row-gap: 0.25rem;   
+    font-family: 'Roboto';
+}
+.groups {
+    grid-row-start: 3;
+    grid-row-end: 3;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+.groups-label {
+    display: flex;
+    align-items: center;
+    grid-row-start: 3;
+    grid-row-end: 3;
+    grid-column-start: 1;
+    grid-column-end: 1;
+    margin-right: 0.5rem;
+}
+.groups-not-in-list {
+    grid-row-start: 4;
+    grid-row-end: 4;
+    grid-column-start: 2;
+    grid-column-end: 2;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    height: 2rem;
+}
+/* https://www.kallmanation.com/styling-a-checkbox-with-only-css */
+.groups-not-in-list input {
+    display: inline-block;
+    height: 1rem;
+    width: 1rem;
+}
+.groups-not-in-list div {
+    margin-left: 0.5rem;
+    color: #777;
+}
+.groups-name {
+    grid-row-start: 5;
+    grid-row-end: 5;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}

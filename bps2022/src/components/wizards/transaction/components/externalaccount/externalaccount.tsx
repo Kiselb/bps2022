@@ -9,8 +9,10 @@ type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
     direction: -1 | 1,
     primary: boolean,
+    regallowed: boolean,
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
+    onDirty: (state: State) => void,
 };
 export type State = {
     type: "EXTERNALACCOUNT",
@@ -21,7 +23,7 @@ export type State = {
 const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && (state.ownerid > 0) && (state.accountid > 0)));
 }
-export const ExternalAccount: FC<Props> = ({ subtype, direction, savedstate, onReady }: Props) => {
+export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, savedstate, onReady, onDirty }: Props) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -44,7 +46,7 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, savedstate, onR
     };
 
     useEffect(() => {
-        validate(state) && onReady({ ...state }, state.notinlist);
+        validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
     }, [state]);
 
     return (
@@ -81,10 +83,14 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, savedstate, onR
                             </li>)
                 }
             </ul>
-            <div className={styles["accounts-not-in-list"]}>
-                <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
-                <div>Счёт в списке отсутствует</div>
-            </div>
+            {
+                regallowed?
+                    <div className={styles["accounts-not-in-list"]}>
+                        <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
+                        <div>Счёт в списке отсутствует</div>
+                    </div>
+                    : null
+            }
         </div>
     );
 };

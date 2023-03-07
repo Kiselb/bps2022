@@ -14,7 +14,14 @@ export const Roadmap: FC<Props> = ({ current, wizard }) => {
         <div className={styles.main}>
             {
                 wizard.map((page, index) => 
-                    <Step key={index} iscurrent={index === current} ismain={isRegularPage(page)} marker={page.marker}/>
+                    <div className={styles.element} key={index}>
+                        <Step iscurrent={index === current} ismain={isRegularPage(page)} marker={page.marker}/>
+                        {
+                            index === wizard.length - 1
+                            ? null
+                            : <div className={styles.connector}></div>
+                        }
+                    </div>
                 )
             }
         </div>

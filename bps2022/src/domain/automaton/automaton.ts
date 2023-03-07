@@ -54,7 +54,7 @@ export type WizardPagesTypes_CONFIRMATION = { type: "CONFIRMATION", identity: st
 export type WizardPagesTypes_REGBANKACCOUNT = { type: "REGBANKACCOUNT", subtype: "INTERNAL" | "EXTERNAL", direction: -1 | 1, registration: boolean, identity: string, marker: string };
 export type WizardPagesTypes_REGORGANIZATION = { type: "REGORGANIZATION", subtype: "INTERNAL" | "EXTERNAL", direction: -1 | 1, client: boolean, identity: string, marker: string };
 export type WizardPagesTypes_REGCASHACCOUNT = { type: "REGCASHACCOUNT", subtype: "INTERNAL" | "EXTERNAL", direction: -1 | 1, identity: string, marker: string };
-export type WizardPagesTypes_REGPERSONALACCOUNT = { type: "REGPERSONALACCOUNT", subtype: "INTERNAL" | "EXTERNAL", identity: string, marker: string };
+export type WizardPagesTypes_REGPERSONALACCOUNT = { type: "REGPERSONALACCOUNT", subtype: "INTERNAL" | "EXTERNAL", direction: -1 | 1, identity: string, marker: string };
 export type WizardPagesTypes_REGLENDINGACCOUNT = { type: "REGLENDINGACCOUNT", identity: string, marker: string };
 export type WizardPagesTypes_REGEXTERNALACCOUNT = { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL" | "EXTERNAL", direction: -1 | 1, identity: string, marker: string };
 export type WizardPagesTypes_REGCOFFERACCOUNT = { type: "REGCOFFERACCOUNT", subtype: "INTERNAL" | "EXTERNAL", direction: -1 | 1, identity: string, marker: string };
@@ -151,7 +151,7 @@ export type TransactionCharges =
     | "ENTERPRISEEXTERNALINCOME"
     | "ENTERPRISEEXTERNALOUTCOME";
 
-export function isChargedPage<U extends { charge: string }>(page: U): page is U {
+export function isChargedPage<U extends { charge: string }>(page: WizardPagesTypesUnion | U): page is U {
     return ("charge" in page);
 }
 
@@ -165,11 +165,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
@@ -184,14 +184,14 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
@@ -203,11 +203,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: true, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: -1, registration: false, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALOUTCOME", marker: "ВС", },
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
@@ -220,11 +220,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: -1, registration: false, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALOUTCOME", marker: "ВС", },
         { type: "ARTICLE", subtype: "EXPENSES", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:EXPENSES", marker: "РХ", },
@@ -237,11 +237,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: false, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
@@ -253,11 +253,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: true, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         // { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -267,11 +267,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "ARTICLE", subtype: "INCOME", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:INCOME", marker: "ДХ", },
         { type: "REGARTICLE", subtype: "INCOME", identity: "TYPE:REGARTICLE;SUBTYPE:INCOME", marker: "?", },
@@ -283,14 +283,14 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -299,11 +299,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: true, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: -1, registration: false, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALOUTCOME", marker: "ВС", },
 
@@ -314,11 +314,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: true, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -327,11 +327,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "ARTICLE", subtype: "EXPENSES", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:EXPENSES", marker: "РХ", },
         { type: "REGARTICLE", subtype: "EXPENSES", identity: "TYPE:REGARTICLE;SUBTYPE:EXPENSES", marker: "?", },
@@ -343,11 +343,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
 
@@ -358,11 +358,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: true, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
@@ -373,11 +373,11 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: true, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: true, identity: "TYPE:REGORGANIZATION;CLIENT:TRUE;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -386,24 +386,24 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: true, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
         ], "Внутреннее перемещение безналичных"],
     ["04-020", null, ["BAI", "BAI"], [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
-        { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
-        { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
+        //{ type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
+        //{ type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
+        //{ type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "OVERDRAFT", primary: true, direction: 1, registration: false, identity: "TYPE:OVERDRAFT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:FALSE", marker: "ОД", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Погашение овердрафта"],
     ["04-030", null, ["BAI", "BAI"], [
@@ -411,18 +411,18 @@ export const automaton: Automaton = [
         { type: "OVERDRAFT", primary: true, direction: -1, registration: true, identity: "TYPE:OVERDRAFT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE", marker: "ОД", },
         { type: "REGOVERDRAFT", identity: "TYPE:REGOVERDRAFT", marker: "?", },
 
-        { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
-        { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
+        //{ type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
+        //{ type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
+        //{ type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Заимствование по овердрафту"],                                                                                    
     ["05-010", null, ["BAI", "CAA"], [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "CASHACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:CASHACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "КС", },
         { type: "REGCASHACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCASHACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
@@ -439,7 +439,7 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "COFFERACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:COFFERACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "ЯЧ", },
         { type: "REGCOFFERACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCOFFERACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
@@ -451,7 +451,7 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: -1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: -1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "COFFERACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:COFFERACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "ЯЧ", },
         { type: "REGCOFFERACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGCOFFERACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
@@ -470,7 +470,7 @@ export const automaton: Automaton = [
 
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "РС", },
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
-        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;CLIENT:FALSE;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
+        { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -481,7 +481,7 @@ export const automaton: Automaton = [
         { type: "REGCASHACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCASHACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -521,7 +521,7 @@ export const automaton: Automaton = [
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -578,7 +578,7 @@ export const automaton: Automaton = [
         { type: "SUMEXCHANGE", exchange: true, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", },
         { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOMENETTING", marker: "КЛ", },
         { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOMENETTING", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -595,7 +595,7 @@ export const automaton: Automaton = [
     ["17-030", null, ["PAC", "PAC"], [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
         { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: null, marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "ARTICLE", subtype: "EXPENSES", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:EXPENSES", marker: "РХ", },
         { type: "REGARTICLE", subtype: "EXPENSES", identity: "TYPE:REGARTICLE;SUBTYPE:EXPENSES", marker: "?", },
@@ -605,11 +605,12 @@ export const automaton: Automaton = [
     ], "Начисление средств клиенту"],
     ["17-040", null, ["PAC", "PAC"], [
         { type: "SUMEXCHANGE", exchange: false, identity: "TYPE:SUMEXCHANGE;EXCHANGE:FALSE", marker: "СК", },
-        { type: "LENDINGACCOUNT", primary: true, direction: -1, registration: true, identity: "TYPE:LENDINGACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE", marker: "СУ", },
-        { type: "REGLENDINGACCOUNT", identity: "TYPE:REGLENDINGACCOUNT", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: null, marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
+
+        { type: "LENDINGACCOUNT", primary: true, direction: -1, registration: true, identity: "TYPE:LENDINGACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE", marker: "СУ", },
+        { type: "REGLENDINGACCOUNT", identity: "TYPE:REGLENDINGACCOUNT", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -639,7 +640,7 @@ export const automaton: Automaton = [
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -699,7 +700,7 @@ export const automaton: Automaton = [
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -736,7 +737,7 @@ export const automaton: Automaton = [
 
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: false, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", marker: "РС", },        
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -761,7 +762,7 @@ export const automaton: Automaton = [
         { type: "REGCASHACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCASHACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
@@ -786,7 +787,7 @@ export const automaton: Automaton = [
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
-        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", identity: "TYPE:REGPERSONALACCOUNT;SUBTYPE:EXTERNAL", marker: "?", },
+        { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },

@@ -80,7 +80,7 @@ export const Selector: FC<Props> = ({ origin, target, onOrigin, onTarget }: Prop
                 <div className={styles["label"]}>Принять на внешний счёт</div>
             </div>
             <div className={styles["target-coffer-account"]} onClick={onTargetCOA}>
-                <div className={[styles["marker"], selector.target === "COA"? styles["marker-active"]: ""].join(' ')}>ВС</div>
+                <div className={[styles["marker"], selector.target === "COA"? styles["marker-active"]: ""].join(' ')}>ЯЧ</div>
                 <div className={styles["label"]}>Принять в ячейку</div>
             </div>
             <div className={styles["income"]} onClick={onOriginINC}>

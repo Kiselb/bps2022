@@ -1,11 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import {
-    Button,
-    Checkbox,
-    Input,
-    Select,
-} from 'antd';
+import { Input } from 'antd';
 
 import styles from './registration.module.css';
 
@@ -13,6 +8,7 @@ export type Props = {
     subtype: "INCOME" | "EXPENSES",
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
+    onDirty: (state: State) => void,
 };
 export type State = {
     type: "REGARTICLE",
@@ -24,7 +20,7 @@ const validate = (state: State, subtype: "INCOME" | "EXPENSES") => {
     if (subtype === "EXPENSES") return ( true && state.name.length > 0 );
 };
 
-export const Registration: FC<Props> = ({ subtype, savedstate, onReady }) => {
+export const Registration: FC<Props> = ({ subtype, savedstate, onReady, onDirty }) => {
     const [state, setStae] = useState<State>(
         savedstate === null?
         {
@@ -39,7 +35,7 @@ export const Registration: FC<Props> = ({ subtype, savedstate, onReady }) => {
     };
 
     useEffect(() => {
-        validate(state, subtype) && onReady({ ...state }, false);
+        validate(state, subtype)? onReady({ ...state }, false): onDirty({ ...state });
     }, [state])
 
     return (

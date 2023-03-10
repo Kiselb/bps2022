@@ -27,7 +27,7 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.overdraftid > 0));
 };
 
-export const Overdraft: FC<Props> = ({ direction, primary, savedstate, regallowed, onReady, onDirty, onNext }) => {
+export const Overdraft: FC<Props> = ({ direction, savedstate, regallowed, onReady, onDirty, onNext }) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -71,7 +71,7 @@ export const Overdraft: FC<Props> = ({ direction, primary, savedstate, regallowe
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                {"Выбор Овердрафта"}
+                {"Выбор Овердрафта " + (direction? "для погашения": "для заимствования")}
             </div>
             <div className={styles.search}>
                 <Input

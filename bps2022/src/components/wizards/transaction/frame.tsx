@@ -182,6 +182,7 @@ export const Frame: FC = () => {
                             exchange={page.exchange}
                             savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
                             onReady={onReady}
+                            onDirty={onDirty}
                         />
                     );
                 case "BANKACCOUNT":

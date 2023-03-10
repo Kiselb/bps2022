@@ -18,6 +18,7 @@ type State = {
     focused: boolean,
     text: string,
     locked: boolean,
+    marker?: string,
 }
 
 export const Decimal: FC<Props> = ({ value, minimumFractionDigits, maximumFractionDigits, handler, validator, locked, marker }) => {
@@ -25,6 +26,7 @@ export const Decimal: FC<Props> = ({ value, minimumFractionDigits, maximumFracti
         focused: false,
         text: value.toString(10).replace('.', Settings.numbers.decimalSeparator),
         locked,
+        marker,
     });
 
     const isManual = useRef(false);

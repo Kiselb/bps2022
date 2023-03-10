@@ -16,6 +16,7 @@ type Props = {
     exchange: boolean,
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
+    onDirty: (state: State) => void,
 };
 export type State = {
     type: "SUMEXCHANGE",
@@ -29,12 +30,12 @@ export type State = {
 };
 const validate = (state: State): boolean => {
     return (
-        !state.exchange && state.originvalue > 0
-        || state.exchange && state.originvalue > 0 && state.targetvalue > 0 && state.origincurrency !== state.targetcurrency
+        (!state.exchange && state.originvalue > 0)
+        || (state.exchange && state.originvalue > 0 && state.targetvalue > 0 && state.origincurrency !== state.targetcurrency)
     );
 };
 
-export const Sums: FC<Props> = ({ exchange, savedstate, onReady }: Props) => {
+export const Sums: FC<Props> = ({ exchange, savedstate, onReady, onDirty }: Props) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -61,7 +62,6 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady }: Props) => {
             case 0:
                 break;
             case 1:
-                console.log("Recalc terget");
                 setState(state => ({ ...state, originvalue, targetvalue: round(originvalue / state.rate, 2) }));
                 break;
             case 2:
@@ -105,7 +105,7 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady }: Props) => {
     };
 
     useEffect(() => {
-        validate(state) && onReady({ ...state }, false);
+        validate(state)? onReady({ ...state }, false): onDirty({ ...state });
     }, [state]);
 
     return (
@@ -131,6 +131,7 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady }: Props) => {
                             defaultValue="RUB"
                             onChange={onOriginCurrency}
                             options={mock.map(item => ({ value: item, label: item}))}
+                            value={state.origincurrency}
                         />
                     </div>
                     {
@@ -196,6 +197,7 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady }: Props) => {
                                         defaultValue="RUB"
                                         onChange={onTargetCurrency}
                                         options={mock.map(item => ({ value: item, label: item}))}
+                                        value={state.targetcurrency}
                                     />
                                 </div>
                                 <Button

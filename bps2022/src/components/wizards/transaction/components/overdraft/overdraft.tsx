@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useRef } from 'react';
 
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
@@ -13,6 +13,7 @@ type Props = {
     regallowed: boolean,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
+    onNext: () => void,
 };
 export type State = {
     type: "OVERDRAFT",
@@ -26,7 +27,7 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.overdraftid > 0));
 };
 
-export const Overdraft: FC<Props> = ({ direction, primary, savedstate, regallowed, onReady, onDirty}) => {
+export const Overdraft: FC<Props> = ({ direction, primary, savedstate, regallowed, onReady, onDirty, onNext }) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -39,9 +40,22 @@ export const Overdraft: FC<Props> = ({ direction, primary, savedstate, regallowe
         }
         : { ...savedstate }
     );
+    const clicks = useRef(1);
 
     const onCurrency = (overdraftid: number, regularaccount: string, overdraftaccount: string) => {
-        setState(state => ({ ...state, overdraftid, regularaccount, overdraftaccount }));
+        if (!state.notinlist) {
+            if (overdraftid === state.overdraftid) {
+                clicks.current += 1;
+            } else {
+                clicks.current = 1;
+            }
+            if (clicks.current > 2) {
+                clicks.current = 1;
+                onNext();
+                return;
+            }
+            setState(state => ({ ...state, overdraftid, regularaccount, overdraftaccount }));
+        }
     };
     const onChangeInList = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, notinlist: event.target.checked }));
@@ -57,7 +71,7 @@ export const Overdraft: FC<Props> = ({ direction, primary, savedstate, regallowe
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                {"Овердрафт"}
+                {"Выбор Овердрафта"}
             </div>
             <div className={styles.search}>
                 <Input
@@ -72,7 +86,7 @@ export const Overdraft: FC<Props> = ({ direction, primary, savedstate, regallowe
             <ul className={styles["overdrafts-list"]}>
                 {
                     mock
-                        .filter(item => state.search.length !== 0 && (item.account.includes(state.search) || item.organization.toUpperCase().includes(state.search.toUpperCase())))
+                        .filter(item => state.search.length !== 0 && (item.account.toUpperCase().includes(state.search.toUpperCase()) || item.organization.toUpperCase().includes(state.search.toUpperCase())))
                         .sort((a, b) => (a.organization < b.organization)? -1: 1)
                         .map(item =>
                             <li

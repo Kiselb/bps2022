@@ -5,8 +5,7 @@
     width: 100%;
     height: 100%;
     padding-bottom: 2rem;   
-    font-family: 'Roboto';
-    font-size: 1rem;
+    row-gap: 0.25rem;
 }
 .header {
     grid-row-start: 1;
@@ -14,12 +13,12 @@
     font-family: 'Roboto';
     font-size: 1.5rem;
     height: fit-content;
+    margin-bottom: 1rem;
 }
 .search {
     grid-row-start: 2;
     grid-row-end: 2;
     height: 2.5rem;
-    margin-top: 1.25rem;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -31,25 +30,6 @@
     padding: 0.25rem;
     height: 1.75rem;
     border-radius: 0;
-}
-.search input:focus {
-    outline-width: 0;
-}
-.search div {
-    background-color:lightskyblue;
-    height: 1.75rem;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-    border: 1px solid;
-    border-right: none;
-    font-size: 1.25rem;
-    color: #777;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
 }
 .clients-item {
     display: flex;
@@ -66,9 +46,13 @@
 .clients-list {
     grid-row-start: 3;
     grid-row-end: 3;
+    font-family: 'Roboto';
+    font-size: 1rem;
     overflow-y: scroll;
     overflow-x: hidden;
-    border: 1px solid #ececec
+    border: 1px solid #ececec;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 .clients-item:nth-child(even) {
     background-color: #fafafa;
@@ -110,9 +94,13 @@
 .accounts-list {
     grid-row-start: 5;
     grid-row-end: 5;
+    font-family: 'Roboto';
+    font-size: 1rem;
     overflow-y: scroll;
     overflow-x: hidden;
-    border: 1px solid #ececec
+    border: 1px solid #ececec;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 .accounts-item:nth-child(even) {
     background-color: #fafafa;
@@ -120,12 +108,14 @@
 .accounts-not-in-list {
     grid-row-start: 6;
     grid-row-end: 6;
+    font-family: 'Roboto';
+    font-size: 1rem;
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    padding-left: 2rem;
-    height: 2rem;
+    padding-left: 2.5rem;
+    height: 2.5rem;
 }
 /* https://www.kallmanation.com/styling-a-checkbox-with-only-css */
 .accounts-not-in-list input {

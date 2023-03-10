@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useRef } from 'react';
 
 import { mock } from './mock';
 import styles from './lendingaccount.module.css';
@@ -11,6 +11,7 @@ export type Props = {
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
+    onNext: () => void,
 };
 export type State = {
     type: "LENDINGACCOUNT",
@@ -22,7 +23,7 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.accountid > 0));
 };
 
-export const LendingAccount: FC<Props> = ({ clientid, direction, regallowed, savedstate, onReady, onDirty }) => {
+export const LendingAccount: FC<Props> = ({ clientid, direction, regallowed, savedstate, onReady, onDirty, onNext }) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -32,19 +33,32 @@ export const LendingAccount: FC<Props> = ({ clientid, direction, regallowed, sav
         }
         : { ...savedstate }
     );
-
-    useEffect(() => {
-        validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
-    }, [state]);
+    const clicks = useRef(1);
 
     const onCurrency = (accountid: number) => {
-        setState(state => ({ ...state, accountid }));
+        if (!state.notinlist) {
+            if (accountid === state.accountid) {
+                clicks.current += 1;
+            } else {
+                clicks.current = 1;
+            }
+            if (clicks.current > 2) {
+                clicks.current = 1;
+                onNext();
+                return;
+            }
+            setState(state => ({ ...state, accountid }));
+        }
     };
     const onChangeInList = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (mock.filter(item => item.clientid === clientid).length > 0) {
             setState(state => ({ ...state, notinlist: event.target.checked }));
         }
     };
+
+    useEffect(() => {
+        validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
+    }, [state]);
 
     return (
         <div className={styles.page}>

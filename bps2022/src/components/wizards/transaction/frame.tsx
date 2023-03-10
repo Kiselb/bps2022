@@ -34,6 +34,7 @@ type State = {
         target: TransactionGroupSelector | null,
     },
     transactionid: TransactionTypesIdentity | null,
+    clicks: number;
     queue: WizardPagesTypesUnion[],
 };
 
@@ -46,6 +47,7 @@ export const Frame: FC = () => {
                 target: null,
             },
             transactionid: null,
+            clicks: 0,
             queue: [],
         }
     );
@@ -58,7 +60,7 @@ export const Frame: FC = () => {
 
     const getAutomatonParameter = (identity: string, parameter: string): number | null => {
         const parameters = pagesstate.current.storage.get(identity);
-        if (parameter in parameters) return parameters[parameter];
+        //if (parameter in parameters) return parameters[parameter];
         return null;
     };
     
@@ -66,10 +68,18 @@ export const Frame: FC = () => {
         setState(state => ({...state, selection: {...state.selection, origin: origin as TransactionGroupSelector }}));
     };
     const onTarget = (target: string) => {
-        setState(state => ({...state, selection: {...state.selection, target: target as TransactionGroupSelector }}));
+        setState(state => {
+            const currentclicks = (target === state.selection.target)? state.clicks + 1: 1;
+            const step = currentclicks > 2? state.step + 1: state.step;
+            return ({...state, step, clicks: currentclicks > 2? 1: currentclicks, selection: {...state.selection, target: target as TransactionGroupSelector }});
+        });
     };
     const onTransaction = (transactionid: TransactionTypesIdentity) => {
-        setState(state => ({...state, transactionid, queue: [...automaton.filter(item => item[0] === transactionid)[0][3] || []] }));
+        setState(state => {
+            const currentclicks = (transactionid === state.transactionid)? state.clicks + 1: 1;
+            const step = currentclicks > 2? state.step + 1: state.step;
+            return ({...state, step, clicks: currentclicks > 2? 1: currentclicks, transactionid, queue: [...automaton.filter(item => item[0] === transactionid)[0][3] || []] });
+        });
     };
     const stepNext = () => {
         if (!pagesstate.current.validated) return;
@@ -99,9 +109,6 @@ export const Frame: FC = () => {
         if (pagesstate.current.history.length > 1) {
             pagesstate.current.history.pop();
             setState(state => ({...state, step: pagesstate.current.history[pagesstate.current.history.length - 1] }));
-            if (pagesstate.current.history[pagesstate.current.history.length - 1] === -2) {
-                setState(state => ({...state, queue: [] }));
-            }
         }
     };
     const onReady = (pagestate:
@@ -187,6 +194,7 @@ export const Frame: FC = () => {
                             savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
                             onReady={onReady}
                             onDirty={onDirty}
+                            onNext={stepNext}
                         />
                     );
                 case "CASHACCOUNT":
@@ -199,6 +207,7 @@ export const Frame: FC = () => {
                             savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
                             onReady={onReady}
                             onDirty={onDirty}
+                            onNext={stepNext}
                         />
                     );
                 case "PERSONALACCOUNT":
@@ -211,6 +220,7 @@ export const Frame: FC = () => {
                             savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
                             onReady={onReady}
                             onDirty={onDirty}
+                            onNext={stepNext}
                         />
                     );
                 case "LENDINGACCOUNT":
@@ -223,6 +233,7 @@ export const Frame: FC = () => {
                             savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
                             onReady={onReady}
                             onDirty={onDirty}
+                            onNext={stepNext}
                         />
                     );
                 case "EXTERNALACCOUNT":
@@ -235,6 +246,7 @@ export const Frame: FC = () => {
                             savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
                             onReady={onReady}
                             onDirty={onDirty}
+                            onNext={stepNext}
                         />
                     );
                 case "COFFERACCOUNT":
@@ -246,6 +258,7 @@ export const Frame: FC = () => {
                             savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
                             onReady={onReady}
                             onDirty={onDirty}
+                            onNext={stepNext}
                         />
                     );
                 case "OVERDRAFT":
@@ -257,6 +270,7 @@ export const Frame: FC = () => {
                             savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
                             onReady={onReady}
                             onDirty={onDirty}
+                            onNext={stepNext}
                         />
                     );
                 case "SERVICECHARGE":
@@ -276,6 +290,7 @@ export const Frame: FC = () => {
                             regallowed={page.registration}
                             onReady={onReady}
                             onDirty={onDirty}
+                            onNext={stepNext}
                         />
                     );
                 case "CONFIRMATION":
@@ -350,9 +365,13 @@ export const Frame: FC = () => {
             <div className={styles.header}>
                 Создание транзакции {state.step !== -2 && !!state.transactionid? "(" + automaton.filter(item => item[0] === state.transactionid)[0][0] + "): " : ""}{state.step !== -2 && !!state.transactionid? automaton.filter(item => item[0] === state.transactionid)[0][4]: ""}
             </div>
-            <div className={styles.roadmap}>
-                <Roadmap wizard={state.queue} current={state.step}/>
-            </div>
+            {
+                state.step !== -2?
+                    <div className={styles.roadmap}>
+                        <Roadmap wizard={state.queue} current={state.step}/>
+                    </div>
+                    : null
+            }
             <div className={styles.pages}>
                 <CurrentPage state={state} />
             </div>

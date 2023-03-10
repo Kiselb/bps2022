@@ -1,4 +1,4 @@
-import { isNumeric, isDecimal, isINN, isKPP, isOGRN, isBankPrimaryAccount, validateBankPrimaryAccount, isBankSecondaryAccount, isBIK } from "./utilities";
+import { isNumeric, isDecimal, round, isINN, isKPP, isOGRN, isBankPrimaryAccount, validateBankPrimaryAccount, isBankSecondaryAccount, isBIK } from "./utilities";
 
 describe('Тестирование isNumeric', () => {
     test('Проверка "0"', () => {
@@ -18,22 +18,42 @@ describe('Тестирование isNumeric', () => {
         expect(isNumeric(test)).toEqual(false);
     });
 });
+
 describe('Тестирование isDecimal', () => {
-    test('Проверка "0.001"', () => {
-        const test = "0.001"
+    test('Проверка "0,001"', () => {
+        const test = "0,001"
         expect(isDecimal(test)).toEqual(true);
     });
-    test('Проверка "-0.001"', () => {
-        const test = "-0.001"
+    test('Проверка "-0,001"', () => {
+        const test = "-0,001"
         expect(isDecimal(test)).toEqual(true);
     });
-    test('Проверка "a0.001" - не только цифры', () => {
-        const test = "a0.001"
+    test('Проверка "a0,001" - не только цифры', () => {
+        const test = "a0,001"
         expect(isDecimal(test)).toEqual(false);
     });
     test('Проверка пустой строки', () => {
         const test = ""
         expect(isDecimal(test)).toEqual(false);
+    });
+});
+
+describe('Тестирование round', () => {
+    test('Проверка округления 1.005 до 2-х знаков', () => {
+        const value = round(1.005, 2);
+        expect(value).toBeCloseTo(1.01);
+    });
+    test('Проверка округления 1.000005 до 5-ти знаков', () => {
+        const value = round(1.000005, 5);
+        expect(value).toBeCloseTo(1.00001);
+    });
+    test('Проверка округления -1.005 до 2-х знаков', () => {
+        const value = round(-1.005, 2);
+        expect(value).toBeCloseTo(-1.01);
+    });
+    test('Проверка округления -1.000005 до 5-ти знаков', () => {
+        const value = round(-1.000005, 5);
+        expect(value).toBeCloseTo(-1.00001);
     });
 });
 

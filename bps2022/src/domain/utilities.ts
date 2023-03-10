@@ -1,28 +1,35 @@
-export function isNumeric(value: string) {
+export const isNumeric = (value: string): boolean => {
     return !isNaN(+value) && !isNaN(parseFloat(value));
 }
 
-export function isDecimal(value: string) {
-    return (/[+-]?([0-9]*[.])?[0-9]+/.test(value) && !isNaN(+value));
+export const isDecimal = (value: string): boolean => {
+    //https://stackoverflow.com/questions/2811031/decimal-or-numeric-values-in-regular-expression-validation
+    //return (/^-?(0|[1-9]\d*)((\.\d+)|(\.))?$/.test(value) && !isNaN(parseFloat(value)));
+    return (/^-?(0|[1-9]\d*)((,\d+)|(,))?$/.test(value) && !isNaN(parseFloat(value)));
 }
 
-export function isINN(value: string) {
+export const round = (value: number, decimalPlaces: number): number => {
+    //https://medium.com/swlh/how-to-round-to-a-certain-number-of-decimal-places-in-javascript-ed74c471c1b8
+    return (Math.sign(value) * Number(Math.round(parseFloat((Math.sign(value) * value).toString() + "e" + decimalPlaces.toString())).toString() + "e-" + decimalPlaces));
+}
+
+export const isINN = (value: string): boolean => {
     return (/^\d{10}$/.test(value) || /^\d{12}$/.test(value));
 }
 
-export function isKPP(value: string) {
+export const isKPP = (value: string): boolean => {
     return (/^\d{9}$/.test(value));
 }
 
-export function isOGRN(value: string) {
+export const isOGRN = (value: string): boolean => {
     return (/^\d{13}$/.test(value) || /^\d{15}$/.test(value));
 }
 
-export function isBankPrimaryAccount(value: string) {
+export const isBankPrimaryAccount = (value: string): boolean => {
     return (/^\d{20}$/.test(value));
 }
 
-export function validateBankPrimaryAccount(value: string, bik: string) {
+export const validateBankPrimaryAccount = (value: string, bik: string): boolean => {
 
     // http://www.kholenkov.ru/data-validation/rs/
     // https://github.com/Kholenkov/js-data-validation/blob/master/data-validation.js
@@ -36,21 +43,15 @@ export function validateBankPrimaryAccount(value: string, bik: string) {
         BigInt(3), BigInt(7), BigInt(1)
     ];
     const surrogate = bik.slice(-3) + value;
-    
-    let checkvalue = BigInt(0);
-
-    for(let i = 0; i < magicdigits.length; i++) {
-        const digit = magicdigits[i];
-        checkvalue = checkvalue + digit * BigInt(parseInt(surrogate[i], 10));
-    }
+    const checkvalue = magicdigits.reduce((accumulator, digit, index) => accumulator + digit * BigInt(parseInt(surrogate[index], 10)), BigInt(0))
 
     return (checkvalue % BigInt(10) === BigInt(0));
 }
 
-export function isBankSecondaryAccount(value: string) {
-    return (value.match(/^\d{20}$/));
+export const isBankSecondaryAccount = (value: string): boolean => {
+    return (/^\d{20}$/.test(value));
 }
 
-export function isBIK(value: string) {
-    return (value.match(/^\d{9}$/));
+export const isBIK = (value: string): boolean => {
+    return (/^\d{9}$/.test(value));
 }

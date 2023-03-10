@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useRef } from 'react';
 
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
@@ -13,6 +13,7 @@ type Props = {
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
+    onNext: () => void,
 };
 export type State = {
     type: "COFFERACCOUNT",
@@ -24,7 +25,7 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.accountid > 0));
 };
 
-export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, onReady, onDirty}) => {
+export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, onReady, onDirty, onNext }) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -35,9 +36,22 @@ export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, on
         }
         : { ...savedstate }
     );
+    const clicks = useRef(1);
 
     const onCurrency = (accountid: number) => {
-        setState(state => ({ ...state, accountid }));
+        if (!state.notinlist) {
+            if (accountid === state.accountid) {
+                clicks.current += 1;
+            } else {
+                clicks.current = 1;
+            }
+            if (clicks.current > 2) {
+                clicks.current = 1;
+                onNext();
+                return;
+            }
+            setState(state => ({ ...state, accountid }));
+        }
     };
     const onChangeInList = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, notinlist: event.target.checked }));
@@ -68,7 +82,7 @@ export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, on
             <ul className={styles["coffers-list"]}>
                 {
                     mock
-                        .filter(item => state.search.length !== 0 && item.name.includes(state.search))
+                        .filter(item => state.search.length !== 0 && item.name.toUpperCase().includes(state.search.toUpperCase()))
                         .sort((a, b) => (a.name < b.name)? -1: 1)
                         .map(item =>
                             <li className={[styles["coffers-item"], state.accountid === item.id? styles["coffers-item-current"]: ""].join(" ")} key={item.id} value={item.name} onClick={() => onCurrency(item.id)}>

@@ -11,9 +11,9 @@ type Props = {
 };
 export const Narrowing: FC<Props> = ({ origin, target, transaction, onTransaction }: Props) => {
     const [currency, setCurrency] = useState<TransactionTypesIdentity | null>(transaction);
-    const onCurrency = (id: TransactionTypesIdentity) => {
-        setCurrency(id);
-        onTransaction(id);
+    const onCurrency = (transactionid: TransactionTypesIdentity) => {
+        setCurrency(transactionid);
+        onTransaction(transactionid);
     };
 
     return (

@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useRef } from 'react';
 
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
@@ -14,6 +14,7 @@ type Props = {
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
+    onNext: () => void,
 };
 export type State = {
     type: "PERSONALACCOUNT",
@@ -32,7 +33,7 @@ const validate = (state: State): boolean => {
         );
 };
 
-export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, savedstate, onReady, onDirty }: Props) => {
+export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, savedstate, onReady, onDirty, onNext }: Props) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -46,12 +47,25 @@ export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
         }
         : { ...savedstate }
     );
+    const clicks = useRef(1);
 
     const onClients = (clientid: number) => {
         setState(state => ({ ...state, clientid }));
     };
     const onAccounts = (accountid: number) => {
-        setState(state => ({ ...state, accountid }));
+        if (!state.accountsnotinlist) {
+            if (accountid === state.accountid) {
+                clicks.current += 1;
+            } else {
+                clicks.current = 1;
+            }
+            if (clicks.current > 2) {
+                clicks.current = 1;
+                onNext();
+                return;
+            }
+            setState(state => ({ ...state, accountid }));
+        }
     };
     const onChangeClientsNotInList = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => (
@@ -85,12 +99,19 @@ export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
                 { (direction === 1? "Начисление: ": "Списание: ") + (subtype === "INTERNAL"? "Лицевые счета организации": "Лицевые счета клиентов") }
             </div>
             <div className={styles.search}>
-                <Input prefix={<SearchOutlined style={{ fontSize: "1.25rem", paddingRight: "0.5rem"}}/>} placeholder="Введите текста для выбора клиента" allowClear onChange={onChangeSearch} style={{ fontSize: "1rem", width: '100%' }} />
+            <Input
+                    prefix={<SearchOutlined style={{ fontSize: "1.25rem", paddingRight: "0.5rem"}}/>}
+                    style={{ fontFamily: 'Roboto', fontSize: "1rem", width: '100%' }}
+                    placeholder="Введите текст для выбора счёта по номеру счёта или названию организации"
+                    allowClear
+                    value={state.search}
+                    onChange={onChangeSearch}
+                />
             </div>
             <ul className={[styles["clients-list"], state.clientsnotinlist? styles["list-disabled"]: ""].join(" ")}>
                 {
                     mock_clients
-                        .filter(item => state.search.length !== 0 && item.name.includes(state.search))
+                        .filter(item => state.search.length !== 0 && item.name.toUpperCase().includes(state.search.toUpperCase()))
                         .sort((a, b) => (a.name < b.name)? -1: 1)
                         .map(item =>
                             <li className={[styles["clients-item"], state.clientid === item.id? styles["clients-item-current"]: ""].join(" ")} key={item.id} value={item.name} onClick={() => onClients(item.id)}>

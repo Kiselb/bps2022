@@ -5,6 +5,7 @@
     width: 100%;
     height: 100%;
     padding-bottom: 2rem;   
+    row-gap: 0.25rem;
 }
 .header {
     grid-row-start: 1;
@@ -12,6 +13,16 @@
     font-family: 'Roboto', sans-serif;
     font-size: 1.5rem;
     height: fit-content;
+    margin-bottom: 1rem;
+}
+.search {
+    grid-row-start: 2;
+    grid-row-end: 2;
+    height: 2.5rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
 }
 .accounts-item {
     display: flex;
@@ -28,11 +39,13 @@
 .accounts-list {
     grid-row-start: 3;
     grid-row-end: 3;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto';
     font-size: 1rem;
     overflow-y: scroll;
     overflow-x: hidden;
-    border: 1px solid #ececec
+    border: 1px solid #ececec;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 .accounts-item:nth-child(even) {
     background-color: #fafafa;
@@ -40,7 +53,7 @@
 .accounts-not-in-list {
     grid-row-start: 4;
     grid-row-end: 4;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto';
     font-size: 1rem;
     display: flex;
     flex-direction: row;

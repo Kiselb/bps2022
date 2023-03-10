@@ -1,5 +1,6 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useRef } from 'react';
 
+import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 import styles from './bankaccount.module.css';
@@ -13,32 +14,51 @@ type Props = {
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
+    onNext: () => void,
 };
 export type State = {
     type: "BANKACCOUNT",
     accountid: number,
-    notinlist: boolean,    
+    notinlist: boolean,
+    search: string,
 };
 const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.accountid > 0));
 };
 
-export const BankAccount: FC<Props> = ({ subtype, direction, savedstate, regallowed, onReady, onDirty }: Props) => {
+export const BankAccount: FC<Props> = ({ subtype, direction, savedstate, regallowed, onReady, onDirty, onNext }: Props) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
             type: "BANKACCOUNT",
             accountid: -1,
-            notinlist: false
+            notinlist: false,
+            search: "",
         }
         : { ...savedstate }
     );
+    const clicks = useRef(1);
 
     const onCurrency = (accountid: number) => {
-        setState(state => ({ ...state, accountid }));
+        if (!state.notinlist) {
+            if (accountid === state.accountid) {
+                clicks.current += 1;
+            } else {
+                clicks.current = 1;
+            }
+            if (clicks.current > 2) {
+                clicks.current = 1;
+                onNext();
+                return;
+            }
+            setState(state => ({ ...state, accountid }));
+        }
     };
     const onChangeInList = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, notinlist: event.target.checked }));
+    };
+    const onChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState(state => ({ ...state, accountid: 0, search: event.target.value }));
     };
 
     useEffect(() => {
@@ -51,13 +71,20 @@ export const BankAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
                 { (direction === 1? "Приём: ": "Отправка: ") + (subtype === "INTERNAL"? "Расчётные счета организации": "Расчётные счета внешние")}
             </div>
             <div className={styles.search}>
-                <input type="text" placeholder='Поиск'></input>
-                <div><SearchOutlined/></div>
+                <Input
+                    prefix={<SearchOutlined style={{ fontSize: "1.25rem", paddingRight: "0.5rem"}}/>}
+                    style={{ fontFamily: 'Roboto', fontSize: "1rem", width: '100%' }}
+                    placeholder="Введите текст для выбора счёта по номеру счёта или названию организации"
+                    allowClear
+                    value={state.search}
+                    onChange={onChangeSearch}
+                />
             </div>
             <ul className={styles["accounts-list"]}>
                 {
                     mock
                         .filter(item => (subtype === "EXTERNAL" && item.external === true) || (subtype === "INTERNAL" && item.external === false))
+                        .filter(item => state.search.length > 0 && (item.account.includes(state.search) || item.organization.toUpperCase().includes(state.search.toUpperCase())))
                         .sort((a, b) => (a.organization < b.organization)? -1: 1)
                         .map(item =>
                             <li className={[styles["accounts-item"], state.accountid === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.account} onClick={() => onCurrency(item.id)}>

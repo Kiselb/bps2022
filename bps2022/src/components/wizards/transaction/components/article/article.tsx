@@ -1,5 +1,6 @@
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect, useRef } from 'react';
 
+import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 import styles from './article.module.css';
@@ -11,11 +12,13 @@ type Props = {
     regallowed: boolean,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
+    onNext: () => void,
 };
 export type State = {
     type: "ARTICLE",
     articleid: number,
     notinlist: boolean,
+    search: string,
 };
 
 const validate = (state: State) => {
@@ -25,23 +28,40 @@ const validate = (state: State) => {
     );
 };
 
-export const Article: FC<Props> = ({ subtype, savedstate, regallowed, onReady, onDirty }: Props) => {
+export const Article: FC<Props> = ({ subtype, savedstate, regallowed, onReady, onDirty, onNext }: Props) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
             type: "ARTICLE",
             articleid: -1,
             notinlist: false,
+            search: "",
         }
         : { ...savedstate }
     );
+    const clicks = useRef(1);
 
     const onCurrency = (articleid: number) => {
-        setState(state => ({ ...state, articleid }));
+        if (!state.notinlist) {
+            if (articleid === state.articleid) {
+                clicks.current += 1;
+            } else {
+                clicks.current = 1;
+            }
+            if (clicks.current > 2) {
+                clicks.current = 1;
+                onNext();
+                return;
+            }
+            setState(state => ({ ...state, articleid }));
+        }
     };
     const onChangeInList = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, notinlist: event.target.checked }));
-    }
+    };
+    const onChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState(state => ({ ...state, accountid: 0, search: event.target.value }));
+    };
 
     useEffect(() => {
         validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
@@ -53,13 +73,20 @@ export const Article: FC<Props> = ({ subtype, savedstate, regallowed, onReady, o
                 { (subtype === "EXPENSES"? "Расходы: ": "Доходы: ") }
             </div>
             <div className={styles.search}>
-                <input type="text" placeholder='Поиск'></input>
-                <div><SearchOutlined/></div>
+                <Input
+                    prefix={<SearchOutlined style={{ fontSize: "1.25rem", paddingRight: "0.5rem"}}/>}
+                    style={{ fontFamily: 'Roboto', fontSize: "1rem", width: '100%' }}
+                    placeholder="Введите текст для выбора счёта по номеру счёта или названию организации"
+                    allowClear
+                    value={state.search}
+                    onChange={onChangeSearch}
+                />
             </div>
             <ul className={styles["articles-list"]}>
                 {
                     mock
                         .filter(item => (subtype === "INCOME" && item.type === "INCOME") || (subtype === "EXPENSES" && item.type === "EXPENSES"))
+                        .filter(item => state.search.length === 0 || item.article.toUpperCase().includes(state.search.toUpperCase()))
                         .sort((a, b) => (a.article < b.article)? -1: 1)
                         .map(item =>
                             <li className={[styles["articles-item"], state.articleid === item.id? styles["articles-item-current"]: ""].join(" ")} key={item.id} value={item.id} onClick={() => onCurrency(item.id)}>

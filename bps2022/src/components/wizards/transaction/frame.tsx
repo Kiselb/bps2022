@@ -277,7 +277,7 @@ export const Frame: FC = () => {
                 case "SERVICECHARGE":
                     return (
                         <ServiceCharge
-                            wizard={state.queue}
+                            charges={page.charges}
                             savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
                             onReady={onReady}
                             onDirty={onDirty}

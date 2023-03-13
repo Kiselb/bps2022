@@ -9,7 +9,7 @@ import styles from './servicecharge.module.css';
 import { isDecimal } from '../../../../../domain/utilities';
 
 type Props = {
-    wizard: WizardPagesTypesUnion[],
+    charges: TransactionCharges[],
     savedstate: State,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
@@ -39,10 +39,10 @@ const validate = (state: State): boolean => {
     return false;
 };
 
-export const ServiceCharge: FC<Props> = ({ wizard, savedstate, onReady, onDirty }) => {
+export const ServiceCharge: FC<Props> = ({ charges, savedstate, onReady, onDirty }) => {
     const [state, setState] = useState<State>(() => {
         if (savedstate === null) {
-            const charges: Charges = {
+            const chargeslist: Charges = {
                 CLIENTPERSONALINCOME: { charge: "0.00", isabsolute: false, isincluded: false, isallowed: false },
                 CLIENTPERSONALOUTCOME: { charge: "0.00", isabsolute: false, isincluded: false, isallowed: false },
                 CLIENTPERSONALINCOMENETTING: { charge: "0.00", isabsolute: false, isincluded: false, isallowed: false },
@@ -51,14 +51,11 @@ export const ServiceCharge: FC<Props> = ({ wizard, savedstate, onReady, onDirty 
                 ENTERPRISEEXTERNALOUTCOME: { charge: "0.00", isabsolute: false, isincluded: false, isallowed: false },
             };
     
-            for(let i = 0; i < wizard.length; i++) {
-                const page = wizard[i];
-                if (isChargedPage(page)) {
-                    charges[page.charge].isallowed = true;
-                }
+            for(let i = 0; i < charges.length; i++) {
+                chargeslist[charges[i]].isallowed = true;
             }
             console.log(charges);
-            return ({ type: "SERVICECHARGE", charges});
+            return ({ type: "SERVICECHARGE", charges: chargeslist });
         }
         return { ...savedstate };
     });

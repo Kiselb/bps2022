@@ -48,7 +48,7 @@ export type WizardPagesTypes_COFFERACCOUNT = { type: "COFFERACCOUNT", primary: b
 export type WizardPagesTypes_OVERDRAFT = { type: "OVERDRAFT", primary: boolean, direction: -1 | 1, registration: boolean, identity: string, marker: string };
 export type WizardPagesTypes_SERVICEFEE = { type: "SERVICEFEE", identity: string, marker: string };
 export type WizardPagesTypes_ARTICLE = { type: "ARTICLE", subtype: "INCOME" | "EXPENSES", registration: boolean, identity: string, marker: string };
-export type WizardPagesTypes_SERVICECHARGE = { type: "SERVICECHARGE", identity: string, marker: string };
+export type WizardPagesTypes_SERVICECHARGE = { type: "SERVICECHARGE", identity: string, charges: TransactionCharges[], marker: string };
 export type WizardPagesTypes_CONFIRMATION = { type: "CONFIRMATION", identity: string, marker: string };
 
 export type WizardPagesTypes_REGBANKACCOUNT = { type: "REGBANKACCOUNT", subtype: "INTERNAL" | "EXTERNAL", direction: -1 | 1, registration: boolean, identity: string, marker: string };
@@ -177,7 +177,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "INCOME", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:INCOME", marker: "ДХ", },
         { type: "REGARTICLE", subtype: "INCOME", identity: "TYPE:REGARTICLE;SUBTYPE:INCOME", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Приём безналичных на внешний счёт в доход"],
     ["01-020", null, ["BAE", "BAE"], [
@@ -196,7 +196,7 @@ export const automaton: Automaton = [
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALINCOME", "ENTERPRISEEXTERNALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Приём безналичных на внешний счет в пользу клиента"],		
     ["01-030", null, ["BAE", "BAE"], [
@@ -213,7 +213,7 @@ export const automaton: Automaton = [
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALOUTCOME", "ENTERPRISEEXTERNALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Перемещение между внешними счетами различных развивающих"],
     ["01-050", null, ["BAE", "BAE"], [
@@ -230,7 +230,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "EXPENSES", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:EXPENSES", marker: "РХ", },
         { type: "REGARTICLE", subtype: "EXPENSES", identity: "TYPE:REGARTICLE;SUBTYPE:EXPENSES", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка безналичных из развития в расход"],
     ["01-060", null, ["BAE", "BAE"], [
@@ -246,7 +246,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: false, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALOUTCOME", "ENTERPRISEEXTERNALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка безналичных из развития в пользу клиента"],
     ["01-070", null, ["BAE", "BAE"], [
@@ -276,7 +276,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "INCOME", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:INCOME", marker: "ДХ", },
         { type: "REGARTICLE", subtype: "INCOME", identity: "TYPE:REGARTICLE;SUBTYPE:INCOME", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Приём безналичных в доход"],							
     ["02-020", null, ["BAE", "BAI"], [
@@ -292,7 +292,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
         { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Приём безналичных в пользу клиента"],				
     ["02-030", null, ["BAE", "BAI"], [
@@ -307,7 +307,7 @@ export const automaton: Automaton = [
 
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: -1, registration: false, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALOUTCOME", marker: "ВС", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Приём безналичных из развития"],
     ["02-050", null, ["BAE", "BAI"], [
@@ -320,7 +320,7 @@ export const automaton: Automaton = [
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
         { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Приём неопознанный"],                                                                                    
     ["03-010", null, ["BAI", "BAE"], [
@@ -336,7 +336,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "EXPENSES", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:EXPENSES", marker: "РХ", },
         { type: "REGARTICLE", subtype: "EXPENSES", identity: "TYPE:REGARTICLE;SUBTYPE:EXPENSES", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка безналичных в расход"],
     ["03-020", null, ["BAI", "BAE"], [
@@ -351,7 +351,7 @@ export const automaton: Automaton = [
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка безналичных в пользу клиента"],
     ["03-030", null, ["BAI", "BAE"], [
@@ -367,6 +367,7 @@ export const automaton: Automaton = [
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка безналичных в развитие"],
     ["03-050", null, ["BAI", "BAE"], [
@@ -379,7 +380,7 @@ export const automaton: Automaton = [
         { type: "REGBANKACCOUNT", subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", },
         { type: "REGORGANIZATION", subtype: "EXTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка неопознанная"],                                                                                    
     ["04-010", null, ["BAI", "BAI"], [
@@ -392,7 +393,7 @@ export const automaton: Automaton = [
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
         { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
         ], "Внутреннее перемещение безналичных"],
     ["04-020", null, ["BAI", "BAI"], [
@@ -427,7 +428,7 @@ export const automaton: Automaton = [
         { type: "CASHACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:CASHACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "КС", },
         { type: "REGCASHACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCASHACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Снятие наличных с расчётного счёта"],                                                                                    
     ["06-010", "02-010", ["BAE", "PAC"], null, "Приём безналичных в доход"],
@@ -444,7 +445,7 @@ export const automaton: Automaton = [
         { type: "COFFERACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:COFFERACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "ЯЧ", },
         { type: "REGCOFFERACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCOFFERACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка безналичных в ячейку"],
     ["09-011", null, ["BAI", "COA"], [
@@ -458,7 +459,7 @@ export const automaton: Automaton = [
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка безналичных в ячейку клиента"],
                                                                                     
@@ -472,7 +473,7 @@ export const automaton: Automaton = [
         { type: "REGBANKACCOUNT", subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "?", },
         { type: "REGORGANIZATION", subtype: "INTERNAL", direction: 1, client: false, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение наличных на расчётный счёт"],                                                                                    
     ["11-010", null, ["CAA", "CAA"], [
@@ -483,7 +484,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
         { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение наличных клиентом"],				
     ["11-020", null, ["CAA", "CAA"], [
@@ -492,7 +493,7 @@ export const automaton: Automaton = [
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Выдача наличных клиенту"],
     ["11-030", null, ["CAA", "CAA"], [
@@ -502,7 +503,7 @@ export const automaton: Automaton = [
         { type: "CASHACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:CASHACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "КС", },
         { type: "REGCASHACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCASHACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внутреннее перемещение наличных"],                                                                                    
     ["12-010", null, ["CAA", "PAC"], [
@@ -511,7 +512,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "EXPENSES", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:EXPENSES", marker: "РХ", },
         { type: "REGARTICLE", subtype: "EXPENSES", identity: "TYPE:REGARTICLE;SUBTYPE:EXPENSES", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Списание наличных в расход"],
     ["12-020", "10-010", ["CAA", "PAC"], null, "Внесение наличных клиентом"],                                                                                    
@@ -523,7 +524,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
         { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALINCOME", "CLIENTPERSONALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение наличных клиентом в развитие"],
     ["13-020", null, ["CAA", "XAC"], [
@@ -533,7 +534,7 @@ export const automaton: Automaton = [
         { type: "EXTERNALACCOUNT", primary: false, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение наличных в развитие"],                                                                                    
     ["14-010", null, ["CAA", "COA"], [
@@ -543,7 +544,7 @@ export const automaton: Automaton = [
         { type: "COFFERACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:COFFERACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "ЯЧ", },
         { type: "REGCOFFERACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCOFFERACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение наличных в ячейку предприятия"],
     ["14-011", null, ["CAA", "COA"], [
@@ -555,7 +556,7 @@ export const automaton: Automaton = [
 
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение наличных в ячейку клиента"],
                                                                                     
@@ -570,7 +571,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "INCOME", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:INCOME", marker: "ДХ", },
         { type: "REGARTICLE", subtype: "INCOME", identity: "TYPE:REGARTICLE;SUBTYPE:INCOME", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Начисление наличных в доход"],
     ["16-020", "11-020", ["PAC", "CAA"], null, "Выдача наличных клиенту"],                                                                                    
@@ -580,7 +581,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOMENETTING", marker: "КЛ", },
         { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALOUTCOMENETTING", "CLIENTPERSONALINCOMENETTING"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Взаимозачёт между клиентами"],
     ["17-020", null, ["PAC", "PAC"], [
@@ -589,7 +590,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "INCOME", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:INCOME", marker: "ДХ", },
         { type: "REGARTICLE", subtype: "INCOME", identity: "TYPE:REGARTICLE;SUBTYPE:INCOME", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Списание средств с клиента"],
     ["17-030", null, ["PAC", "PAC"], [
@@ -600,7 +601,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "EXPENSES", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:EXPENSES", marker: "РХ", },
         { type: "REGARTICLE", subtype: "EXPENSES", identity: "TYPE:REGARTICLE;SUBTYPE:EXPENSES", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Начисление средств клиенту"],
     ["17-040", null, ["PAC", "PAC"], [
@@ -612,7 +613,7 @@ export const automaton: Automaton = [
         { type: "LENDINGACCOUNT", primary: true, direction: -1, registration: true, identity: "TYPE:LENDINGACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:TRUE", marker: "СУ", },
         { type: "REGLENDINGACCOUNT", identity: "TYPE:REGLENDINGACCOUNT", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Выдача клиенту ссуды"],
     ["17-050", null, ["PAC", "PAC"], [
@@ -620,7 +621,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: null, marker: "КЛ", },
         { type: "LENDINGACCOUNT", primary: true, direction: 1, registration: false, identity: "TYPE:LENDINGACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:FALSE", marker: "СУ", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Погашение клиентом ссуды"],                                                                                    
     ["18-010", null, ["PAC", "XAC"], [
@@ -631,7 +632,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "INCOME", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:INCOME", marker: "ДХ", },
         { type: "REGARTICLE", subtype: "INCOME", identity: "TYPE:REGARTICLE;SUBTYPE:INCOME", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Начисление в развитие доход"],
     ["18-020", null, ["PAC", "XAC"], [
@@ -642,7 +643,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
         { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALINCOME", "CLIENTPERSONALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Начисление в развитие и клиенту"],
                                                                                     
@@ -657,7 +658,7 @@ export const automaton: Automaton = [
         { type: "CASHACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:CASHACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "КС", },
         { type: "REGCASHACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCASHACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Приём наличных из развития"],
     ["21-020", null, ["XAC", "CAA"], [
@@ -665,7 +666,7 @@ export const automaton: Automaton = [
         { type: "EXTERNALACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: false, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALOUTCOME", marker: "ВС", },
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALOUTCOME", "CLIENTPERSONALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Выдача наличных из развития клиенту"],                                                                                    
     ["22-010", null, ["XAC", "PAC"], [
@@ -674,7 +675,7 @@ export const automaton: Automaton = [
         { type: "ARTICLE", subtype: "EXPENSES", registration: true, identity: "TYPE:ARTICLE;REGISTRATION:TRUE;SUBTYPE:EXPENSES", marker: "РХ", },
         { type: "REGARTICLE", subtype: "EXPENSES", identity: "TYPE:REGARTICLE;SUBTYPE:EXPENSES", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Списание из развития в расход"],                                                                                    
     ["23-010", null, ["XAC", "XAC"], [
@@ -683,7 +684,7 @@ export const automaton: Automaton = [
         { type: "EXTERNALACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALOUTCOME", "ENTERPRISEEXTERNALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Перемещение по внешним счетам у одного развивающего"],
     ["23-020", null, ["XAC", "XAC"], [
@@ -691,7 +692,7 @@ export const automaton: Automaton = [
         { type: "EXTERNALACCOUNT", primary: true, subtype: "INTERNAL", direction: -1, registration: false, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALOUTCOME", marker: "ВС", },
         { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALOUTCOME", "CLIENTPERSONALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка с внешнего счёта на внещний счёт клиента"],
     ["23-030", null, ["XAC", "XAC"], [
@@ -702,7 +703,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
         { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALINCOME", "CLIENTPERSONALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Приём на внешний счёт с внещнего счёта клиента"],
     ["23-040", "01-030", ["XAC", "XAC"], null, "Перемещение между внешними счетами различных развивающих"],
@@ -717,7 +718,7 @@ export const automaton: Automaton = [
         { type: "BANKACCOUNT", primary: true, subtype: "EXTERNAL", direction: 1, registration: false, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", marker: "РС", },
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: -1, registration: false, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALOUTCOME", marker: "КЛ", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALOUTCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Отправка из ячейки на расчётный счёт внешний со списанием с клиента"],                                                                                    
     ["25-010", null, ["COA", "BAI"], [
@@ -727,7 +728,7 @@ export const automaton: Automaton = [
 
         { type: "BANKACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: false, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", marker: "РС", },        
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение из ячейки на расчётный счёт предприятия"],
     ["25-011", null, ["COA", "BAI"], [
@@ -739,7 +740,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
         { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение из ячейки на расчётный счёт предприятия в пользу клиента"],                                                                                    
     ["26-010", null, ["COA", "CAA"], [
@@ -750,7 +751,7 @@ export const automaton: Automaton = [
         { type: "CASHACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:CASHACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "КС", },
         { type: "REGCASHACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGCASHACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        //{ type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Перемещение из ячейки в кассу предприятия"],
     ["26-011", null, ["COA", "CAA"], [
@@ -764,7 +765,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
         { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["CLIENTPERSONALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Перемещение из ячейки в кассу предприятия в пользу клиента"],                                                                                    
     ["27-010", null, ["COA", "XAC"], [
@@ -775,7 +776,7 @@ export const automaton: Automaton = [
         { type: "EXTERNALACCOUNT", primary: true, subtype: "INTERNAL", direction: 1, registration: true, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", charge: "ENTERPRISEEXTERNALINCOME", marker: "ВС", },
         { type: "REGEXTERNALACCOUNT", subtype: "INTERNAL", direction: 1, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение из ячейки на внешний счёт предприятия"],
     ["27-011", null, ["COA", "XAC"], [
@@ -789,7 +790,7 @@ export const automaton: Automaton = [
         { type: "PERSONALACCOUNT", primary: false, subtype: "EXTERNAL", direction: 1, registration: true, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", charge: "CLIENTPERSONALINCOME", marker: "КЛ", },
         { type: "REGPERSONALACCOUNT", subtype: "EXTERNAL", direction: 1, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", },
 
-        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", marker: "%%", },
+        { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", charges: ["ENTERPRISEEXTERNALINCOME", "CLIENTPERSONALINCOME"], marker: "%%", },
         { type: "CONFIRMATION", identity: "TYPE:CONFIRMATION", marker: "ПТ", },
     ], "Внесение из ячейки на внешний счёт предприятия в пользу клиента"],
                                                                                     

@@ -1,6 +1,6 @@
 .frame {
     display: grid;
-    grid-template-rows: 5rem calc(100% - 8rem) 4rem;
+    grid-template-rows: 4rem 1fr 4rem;
     grid-template-columns: 7rem 1fr;
     height: 100%;
 }
@@ -11,6 +11,7 @@
     grid-column-end: span 2;
     font-family: 'Roboto';
     font-size: 1.65rem;
+    overflow: hidden;
 }
 .roadmap {
     grid-row-start: 1;
@@ -26,6 +27,7 @@
     grid-column-end: 2;
     width: 100%;
     height: 100%;
+    margin-top: 1rem;
 }
 .navigation {
     grid-row-start: 3;

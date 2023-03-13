@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, MouseEvent } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 
 import { LockOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Input, Select } from 'antd';
@@ -100,7 +100,7 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady, onDirty }: Prop
     const onExchange = (event: CheckboxChangeEvent) => {
         exchange && setState(state => ({ ...state, exchange: event.target.checked }));
     };
-    const onLock = (event: MouseEvent, lock: 0 | 1 | 2) => {
+    const onLock = (lock: 0 | 1 | 2) => () => {
         setState(state => ({ ...state, lock }));
     };
 
@@ -111,7 +111,7 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady, onDirty }: Prop
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { exchange? "Суммы транзакции": "Сумма транзакции" }
+                { state.exchange? "Суммы транзакции": "Сумма транзакции" }
             </div>
             <div className={styles["sums-origin"]}>
                 <Input.Group compact>
@@ -139,7 +139,7 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady, onDirty }: Prop
                             <Button
                                 type={state.lock === 0? 'primary': 'default' }
                                 style={{ height: "2.75rem" }}
-                                onClick={(event) => onLock(event, 0)}
+                                onClick={onLock(0)}
                             >
                                 <LockOutlined style={{ fontSize: "1.25rem" }}/>
                             </Button>
@@ -173,7 +173,7 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady, onDirty }: Prop
                                 <Button
                                     type={state.lock === 1? 'primary': 'default' }
                                     style={{ height: "2.75rem", width: "3.25rem" }}
-                                    onClick={(event) => onLock(event, 1)}
+                                    onClick={onLock(1)}
                                 >
                                     <LockOutlined style={{ fontSize: "1.25rem" }}/>
                                 </Button>
@@ -203,7 +203,7 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady, onDirty }: Prop
                                 <Button
                                     type={state.lock === 2? 'primary': 'default' }
                                     style={{ height: "2.75rem", width: "3.25rem" }}
-                                    onClick={(event) => onLock(event, 2)}
+                                    onClick={onLock(2)}
                                 >
                                     <LockOutlined style={{ fontSize: "1.25rem" }}/>
                                 </Button>

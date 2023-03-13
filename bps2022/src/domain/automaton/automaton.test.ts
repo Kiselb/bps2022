@@ -1,4 +1,4 @@
-import { automaton, WizardPagesTypesUnion } from './automaton';
+import { automaton, WizardPagesTypesUnion, TransactionCharges } from './automaton';
 
 test('Тестирование автомата транзакций: основных счётов не более двух', () => {
     expect(automaton
@@ -78,5 +78,30 @@ test('Тестирование уникальности Identity в рамках
     }
     expect(result).toEqual(true);
 });
-
-export {};
+test('Тестирования списка стоимости обслуживания транзакции', () => {
+    let result = true;
+    for(let i = 0; i < automaton.length; i++) {
+        const pages = automaton[i][3];
+        if (pages !== null) {
+            let charges: TransactionCharges[] = [];
+            let chargescheck = [];
+            for(let j = 0; j < pages.length; j++) {
+                const page = pages[j];
+                if (page.type === "SERVICECHARGE") {
+                    charges = [...page.charges]
+                } else {
+                    if ("charge" in page) {
+                        if (page.charge !== null) {
+                            chargescheck.push(page.charge);
+                        }
+                    }
+                }
+            }
+            charges = charges.sort();
+            chargescheck = chargescheck.sort();
+            result = result && JSON.stringify(charges) === JSON.stringify(chargescheck);
+            if (!result) console.log(automaton[i][0]);
+        }
+    }
+    expect(result).toEqual(true);
+});

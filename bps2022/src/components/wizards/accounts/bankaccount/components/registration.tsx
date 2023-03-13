@@ -58,32 +58,32 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady,
         : { ...savedstate }
     );
     const onPrimaryNo = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState(state => ({ ...state, primaryno: event.target.value}));
-    }
+        setState(state => ({ ...state, primaryno: event.target.value }));
+    };
     const onSecondaryNo = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState(state => ({ ...state, secondaryno: event.target.value}));
-    }
+        setState(state => ({ ...state, secondaryno: event.target.value }));
+    };
     const onBankName = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState(state => ({ ...state, bankname: event.target.value}));
-    }
+        setState(state => ({ ...state, bankname: event.target.value }));
+    };
     const onBIK = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState(state => ({ ...state, bik: event.target.value}));
-    }
+        setState(state => ({ ...state, bik: event.target.value }));
+    };
     const onCity = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState(state => ({ ...state, city: event.target.value}));
-    }
-    const onCurrency = (value: string) => {
-        setState(state => ({ ...state, primaryno: value}));
-    }
+        setState(state => ({ ...state, city: event.target.value }));
+    };
+    const onCurrency = (currency: string) => {
+        setState(state => ({ ...state, currency }));
+    };
     const onInlist = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState(state => ({ ...state, notinlist: event.target.checked}));
-    }
+        setState(state => ({ ...state, notinlist: event.target.checked }));
+    };
     const onOrganization = (id: number) => {
-        setState(state => ({ ...state, organizationid: id}));
-    }
+        setState(state => ({ ...state, organizationid: id }));
+    };
     const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, search: event.target.value }));
-    }
+    };
 
     useEffect(() => {
         validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });

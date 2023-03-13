@@ -79,7 +79,7 @@ export const Registration: FC<Props> = ({ context, subtype, client, savedstate, 
     };
 
     useEffect(() => {
-        console.log(validate(state, client, subtype));
+        console.log(state, client, subtype);
         validate(state, client, subtype)? onReady({ ...state }, false): onDirty({ ...state });
     }, [state]);
 

@@ -14,6 +14,7 @@ type Props = {
 };
 
 export type State = {
+    type: "REGPERSONALACCOUNT",
     name: string,
     groups: string[],
     groupsnotinlist: boolean,
@@ -32,9 +33,10 @@ const validate = (state: State) => {
 };
 
 export const Registration: FC<Props> = ({ context, savedstate, onReady, onDirty }) => {
-    const [state, setState] = useState(() => (
+    const [state, setState] = useState<State>(() => (
         savedstate === null?
             {
+                type: "REGPERSONALACCOUNT",
                 name: "",
                 groups: [],
                 groupsnotinlist: false,

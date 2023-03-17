@@ -26,7 +26,38 @@ import { State as OverdraftRegistrationState, Registration as OverdraftRegistrat
 import { State as ArticleRegistrationState, Registration as ArticleRegistration } from '../../wizards/article/registration';
 
 import styles from './frame.module.css';
+import { Settings } from "../../../domain/settings/settings";
 
+type WizardState = {
+    nextisregistration: boolean,
+    validated: boolean,
+    storage: Map<
+        string,
+        BankAccountState
+        | BankAccountRegistrationState
+        | OrganizationRegistrationState
+        | PersonalAccountRegistrationState
+        | OverdraftRegistrationState
+        | ArticleRegistrationState
+        | SumsState
+        | CashAccountState
+        | PersonalAccountState
+        | LendingAccountState
+        | ExternalAccountState
+        | CofferAccountState
+        | OverdraftState
+        | ArticleState
+        | ConfirmationState
+        | ServiceChargeState
+    >,
+    history: number[],
+    originsumvalue: number,
+    targetsumvalue: number,
+    originsumcurrency: string,
+    targetsumcurrency: string,
+    originclientid: number | null,
+    targetclientid: number | null,
+};
 type State = {
     step: number,
     selection : {
@@ -51,68 +82,73 @@ export const Frame: FC = () => {
             queue: [],
         }
     );
-    const pagesstate = useRef({
-        regnext: false,
+    const pagesstate = useRef<WizardState>({
+        nextisregistration: false,
         validated: true,
         storage: new Map(),
         history: [-2],
+        originsumvalue: 0,
+        originsumcurrency: "RUB",
+        originclientid: null,
+        targetsumvalue: 0,
+        targetsumcurrency: "RUB",
+        targetclientid: null,
     });
 
-    const getAutomatonParameter = (identity: string, parameter: string): number | null => {
-        const parameters = pagesstate.current.storage.get(identity);
-        //if (parameter in parameters) return parameters[parameter];
-        return null;
-    };
-    
     const onOrigin = (origin: string) => {
         setState(state => ({...state, selection: {...state.selection, origin: origin as TransactionGroupSelector }}));
     };
     const onTarget = (target: string) => {
         setState(state => {
             const currentclicks = (target === state.selection.target)? state.clicks + 1: 1;
-            const step = currentclicks > 2? state.step + 1: state.step;
-            return ({...state, step, clicks: currentclicks > 2? 1: currentclicks, selection: {...state.selection, target: target as TransactionGroupSelector }});
+            const step = currentclicks > Settings.clicksOnNext? state.step + 1: state.step;
+            return ({...state, step, clicks: currentclicks > Settings.clicksOnNext? 1: currentclicks, selection: {...state.selection, target: target as TransactionGroupSelector }});
         });
     };
     const onTransaction = (transactionid: TransactionTypesIdentity) => {
         setState(state => {
             const currentclicks = (transactionid === state.transactionid)? state.clicks + 1: 1;
-            const step = currentclicks > 2? state.step + 1: state.step;
-            return ({...state, step, clicks: currentclicks > 2? 1: currentclicks, transactionid, queue: [...automaton.filter(item => item[0] === transactionid)[0][3] || []] });
+            const step = currentclicks > Settings.clicksOnNext? state.step + 1: state.step;
+            return ({...state, step, clicks: currentclicks > Settings.clicksOnNext? 1: currentclicks, transactionid, queue: [...automaton.filter(item => item[0] === transactionid)[0][3] || []] });
         });
     };
     const stepNext = () => {
-        if (!pagesstate.current.validated) return;
-        if (state.step === -2 && (state.selection.origin === null || state.selection.target === null)) return;
-        if (state.step === -1 && state.transactionid === null) return;
-        if (state.step >= state.queue.length - 1) return;
+        if (state.step === state.queue.length - 1) return;
 
-        if (state.step < 0) {
-            setState(state => ({...state, step: state.step + 1 }));
-            pagesstate.current.validated = true;
-            return;
-        }
-        if (pagesstate.current.regnext) {
-            setState(state => ({...state, step: state.step + 1 }));
-            pagesstate.current.validated = false;
-            return;
-        }
-        for(let i = state.step + 1; i < state.queue.length; i++) {
-            if (isRegularPage(state.queue[i])) {
-                setState(state => ({...state, step: i }));
+        if (state.step === -2) {
+            if (state.selection.origin !== null && state.selection.target !== null) {
+                setState(state => ({...state, step: -1 }));
+                //pagesstate.current.validated = true;
+            }
+        } else if (state.step === -1) {
+            if (state.transactionid !== null) {
+                setState(state => ({...state, step: 0 }));
+                //pagesstate.current.validated = true;
+            }
+        } else {
+            if (pagesstate.current.validated) {
+                if (pagesstate.current.nextisregistration) {
+                    setState(state => ({...state, step: state.step + 1 }));
+                } else {
+                    for(let i = state.step + 1; i < state.queue.length; i++) {
+                        if (isRegularPage(state.queue[i])) {
+                            setState(state => ({...state, step: i }));
+                            break;
+                        }
+                    }
+                }
                 pagesstate.current.validated = false;
-                return;
             }
         }
     };
     const stepPrev = () => {
         if (pagesstate.current.history.length > 1) {
             pagesstate.current.history.pop();
-            setState(state => ({...state, step: pagesstate.current.history[pagesstate.current.history.length - 1] }));
+            setState(state => ({ ...state, step: pagesstate.current.history[pagesstate.current.history.length - 1] }));
         }
     };
     const onReady = (pagestate:
-        | BankAccountState
+        BankAccountState
         | BankAccountRegistrationState
         | OrganizationRegistrationState
         | PersonalAccountRegistrationState
@@ -129,12 +165,47 @@ export const Frame: FC = () => {
         | ConfirmationState
         | ServiceChargeState
     , registration: boolean) => {
-        pagesstate.current.regnext = registration;
+        pagesstate.current.nextisregistration = registration;
         pagesstate.current.validated = true;
         pagesstate.current.storage.set(state.queue[state.step].identity, {...pagestate});
+
+        const page = state.queue[state.step];
+        if (page.type === "BANKACCOUNT" && pagestate.type === "BANKACCOUNT") {
+            if (page.direction === -1) {
+                pagesstate.current.originclientid = pagestate.clientid;
+            } else {
+                pagesstate.current.targetclientid = pagestate.clientid;
+            }
+        }
+        if (page.type === "REGBANKACCOUNT" && pagestate.type === "REGBANKACCOUNT") {
+            if (page.direction === -1) {
+                pagesstate.current.originclientid = pagestate.clientid;
+            } else {
+                pagesstate.current.targetclientid = pagestate.clientid;
+            }
+        }
+        if (page.type === "REGORGANIZATION" && pagestate.type === "REGORGANIZATION") {
+            if (page.direction === -1) {
+                pagesstate.current.originclientid = pagestate.clientid;
+            } else {
+                pagesstate.current.targetclientid = pagestate.clientid;
+            }
+        }
+        if (page.type === "EXTERNALACCOUNT" && pagestate.type === "EXTERNALACCOUNT") {
+            if (page.direction === -1 && page.primary) {
+                pagesstate.current.originclientid = pagestate.ownerid;
+                pagesstate.current.targetclientid = pagestate.ownerid;
+            }
+        }
+        if (page.type === "SUMEXCHANGE" && pagestate.type === "SUMEXCHANGE") {
+            pagesstate.current.originsumvalue = pagestate.originvalue;
+            pagesstate.current.targetsumvalue = pagestate.targetvalue;
+            pagesstate.current.originsumcurrency = pagestate.origincurrency;
+            pagesstate.current.targetsumcurrency = pagestate.targetcurrency;
+        }
     };
     const onDirty = (pagestate:
-        | BankAccountState
+        BankAccountState
         | BankAccountRegistrationState
         | OrganizationRegistrationState
         | PersonalAccountRegistrationState
@@ -152,7 +223,39 @@ export const Frame: FC = () => {
         | ServiceChargeState) => {
         pagesstate.current.validated = false;
         pagesstate.current.storage.set(state.queue[state.step].identity, {...pagestate});
+        const page = state.queue[state.step];
+        if ("client" in page) {
+            if ("direction" in page) {
+                if ("clientid" in pagestate) {
+                    if (page.direction === -1) {
+                        pagesstate.current.originclientid = null;
+                    } else {
+                        pagesstate.current.targetclientid = null;
+                    }
+                }
+            }
+        }
     };
+    const onNext = (): void => stepNext();
+
+    const getSavedState = (identity: string):
+        BankAccountState
+        | BankAccountRegistrationState
+        | OrganizationRegistrationState
+        | PersonalAccountRegistrationState
+        | OverdraftRegistrationState
+        | ArticleRegistrationState
+        | SumsState
+        | CashAccountState
+        | PersonalAccountState
+        | LendingAccountState
+        | ExternalAccountState
+        | CofferAccountState
+        | OverdraftState
+        | ArticleState
+        | ConfirmationState
+        | ServiceChargeState
+        | null => pagesstate.current.storage.get(identity) || null;
 
     const CurrentPage: FC<{ state: State }> = ({ state }) => {
         if (state.step === -2) {
@@ -180,7 +283,7 @@ export const Frame: FC = () => {
                     return (
                         <Sums
                             exchange={page.exchange}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (SumsState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
                         />
@@ -192,10 +295,11 @@ export const Frame: FC = () => {
                             subtype={page.subtype}
                             direction={page.direction}
                             regallowed={page.registration}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            client={page.client}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (BankAccountState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
-                            onNext={stepNext}
+                            onNext={onNext}
                         />
                     );
                 case "CASHACCOUNT":
@@ -205,10 +309,10 @@ export const Frame: FC = () => {
                             subtype={page.subtype}
                             direction={page.direction}
                             regallowed={page.registration}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (CashAccountState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
-                            onNext={stepNext}
+                            onNext={onNext}
                         />
                     );
                 case "PERSONALACCOUNT":
@@ -218,23 +322,23 @@ export const Frame: FC = () => {
                             subtype={page.subtype}
                             direction={page.direction}
                             regallowed={page.registration}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (PersonalAccountState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
-                            onNext={stepNext}
+                            onNext={onNext}
                         />
                     );
                 case "LENDINGACCOUNT":
                     return (
                         <LendingAccount
                             primary={page.primary}
-                            clientid={getAutomatonParameter("PERSONALACCOUNT", "accountid")}
+                            clientid={1}
                             direction={page.direction}
                             regallowed={page.registration}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (LendingAccountState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
-                            onNext={stepNext}
+                            onNext={onNext}
                         />
                     );
                 case "EXTERNALACCOUNT":
@@ -244,10 +348,11 @@ export const Frame: FC = () => {
                             subtype={page.subtype}
                             direction={page.direction}
                             regallowed={page.registration}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            clientid={page.direction === -1? pagesstate.current.originclientid: pagesstate.current.targetclientid}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (ExternalAccountState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
-                            onNext={stepNext}
+                            onNext={onNext}
                         />
                     );
                 case "COFFERACCOUNT":
@@ -256,10 +361,10 @@ export const Frame: FC = () => {
                             primary={page.primary}
                             direction={page.direction}
                             regallowed={page.registration}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (CofferAccountState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
-                            onNext={stepNext}
+                            onNext={onNext}
                         />
                     );
                 case "OVERDRAFT":
@@ -268,17 +373,17 @@ export const Frame: FC = () => {
                             primary={page.primary}
                             direction={page.direction}
                             regallowed={page.registration}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (OverdraftState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
-                            onNext={stepNext}
+                            onNext={onNext}
                         />
                     );
                 case "SERVICECHARGE":
                     return (
                         <ServiceCharge
                             charges={page.charges}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (ServiceChargeState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
                         />
@@ -287,17 +392,18 @@ export const Frame: FC = () => {
                     return (
                         <Article
                             subtype={page.subtype}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (ArticleState | null)}
                             regallowed={page.registration}
                             onReady={onReady}
                             onDirty={onDirty}
-                            onNext={stepNext}
+                            onNext={onNext}
                         />
                     );
                 case "CONFIRMATION":
                     return (
                         <Confirmation
                             transaction={state.transactionid}
+                            autocomplete={automaton.filter(transaction => transaction[0] === state.transactionid)[0][4]}
                             onReady={onReady}
                         />
                     );
@@ -306,7 +412,8 @@ export const Frame: FC = () => {
                         <BankAccountRegistration
                             context={page.direction === -1? "SENDER": "RECEIVER"}
                             subtype={page.subtype}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            client={page.client}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (BankAccountRegistrationState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
                         />
@@ -317,7 +424,7 @@ export const Frame: FC = () => {
                             context={page.direction === -1? "SENDER": "RECEIVER"}
                             subtype={page.subtype}
                             client={page.client}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (OrganizationRegistrationState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
                         />
@@ -326,7 +433,7 @@ export const Frame: FC = () => {
                     return (
                         <PersonalAccountRegistration
                             context={page.direction === -1? "SENDER": "RECEIVER"}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (PersonalAccountRegistrationState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
                         />
@@ -334,7 +441,7 @@ export const Frame: FC = () => {
                 case "REGOVERDRAFT":
                     return (
                         <OverdraftRegistration 
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (OverdraftRegistrationState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
                         />
@@ -343,7 +450,7 @@ export const Frame: FC = () => {
                     return (
                         <ArticleRegistration
                             subtype={page.subtype}
-                            savedstate={pagesstate.current.storage.has(state.queue[state.step].identity)? pagesstate.current.storage.get(state.queue[state.step].identity): null}
+                            savedstate={getSavedState(state.queue[state.step].identity) as (ArticleRegistrationState | null)}
                             onReady={onReady}
                             onDirty={onDirty}
                         />
@@ -364,7 +471,7 @@ export const Frame: FC = () => {
     return (
         <div className={styles.frame}>
             <div className={styles.header}>
-                Создание транзакции {state.step !== -2 && !!state.transactionid? "(" + automaton.filter(item => item[0] === state.transactionid)[0][0] + "): " : ""}{state.step !== -2 && !!state.transactionid? automaton.filter(item => item[0] === state.transactionid)[0][4]: ""}
+                Создание транзакции {state.step !== -2 && !!state.transactionid? "(" + automaton.filter(item => item[0] === state.transactionid)[0][0] + "): " : ""}{state.step !== -2 && !!state.transactionid? automaton.filter(item => item[0] === state.transactionid)[0][5]: ""}
             </div>
             {
                 state.step !== -2?
@@ -377,7 +484,7 @@ export const Frame: FC = () => {
                 <CurrentPage state={state} />
             </div>
             <div className={styles.navigation}>
-                <div className={styles["navigation-left"]}>
+                <div className={styles["navigation-center"]}>
                     <div className={styles["navigation-button"]}><div><QuestionOutlined/></div></div>
                 </div>
                 <div className={styles["navigation-right"]}>

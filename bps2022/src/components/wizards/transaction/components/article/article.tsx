@@ -5,6 +5,7 @@ import { SearchOutlined } from '@ant-design/icons';
 
 import styles from './article.module.css';
 import { mock } from './mock';
+import { Settings } from '../../../../../domain/settings/settings';
 
 type Props = {
     subtype: "INCOME" | "EXPENSES",
@@ -48,7 +49,7 @@ export const Article: FC<Props> = ({ subtype, savedstate, regallowed, onReady, o
             } else {
                 clicks.current = 1;
             }
-            if (clicks.current > 2) {
+            if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
                 onNext();
                 return;

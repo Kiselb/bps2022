@@ -1,11 +1,11 @@
 .page {
     display: grid;
-    grid-template-rows: auto auto 1fr 1fr auto;
+    grid-template-rows: auto auto auto 1fr auto;
     grid-template-columns: 1fr;
+    row-gap: 0.25rem;
     width: 100%;
     height: 100%;
-    padding-bottom: 2rem;   
-    row-gap: 0.25rem;
+    padding-bottom: 1rem;   
 }
 .header {
     grid-row-start: 1;
@@ -80,6 +80,14 @@
     margin-left: 0.5rem;
     color: #777;
 }
+.owner {
+    grid-row-start: 3;
+    grid-row-end: 3;
+    font-family: 'Roboto';
+    font-size: 1.25rem;
+    text-overflow: ellipsis;
+    margin-bottom: 0.5rem;
+}
 .owners-item {
     display: flex;
     flex-direction: row;
@@ -95,6 +103,7 @@
 .owners-list {
     grid-row-start: 3;
     grid-row-end: 3;
+    min-height: 27rem;
     font-family: 'Roboto';
     font-size: 1rem;
     overflow-y: scroll;

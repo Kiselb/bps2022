@@ -5,12 +5,14 @@ import { SearchOutlined } from '@ant-design/icons';
 
 import styles from './externalaccount.module.css';
 import { mock_owners, mock_accounts } from './mock';
+import { Settings } from '../../../../../domain/settings/settings';
 
 type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
     direction: -1 | 1,
     primary: boolean,
     regallowed: boolean,
+    clientid: number | null,
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
@@ -18,21 +20,21 @@ type Props = {
 };
 export type State = {
     type: "EXTERNALACCOUNT",
-    ownerid: number,
-    accountid: number,
+    ownerid: number | null,
+    accountid: number | null,
     notinlist: boolean,
     search: string,
 };
 const validate = (state: State): boolean => {
-    return ((state.notinlist) || (!state.notinlist && (state.ownerid > 0) && (state.accountid > 0)));
+    return ((state.notinlist) || (!state.notinlist && (state.ownerid !== null) && (state.accountid !== null)));
 }
-export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, savedstate, onReady, onDirty, onNext }: Props) => {
+export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, savedstate, clientid, onReady, onDirty, onNext }: Props) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
             type: "EXTERNALACCOUNT",
-            ownerid: -1,
-            accountid: -1,
+            ownerid: clientid,
+            accountid: null,
             notinlist: false,
             search: "",
         }
@@ -50,7 +52,7 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
             } else {
                 clicks.current = 1;
             }
-            if (clicks.current > 2) {
+            if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
                 onNext();
                 return;
@@ -62,7 +64,7 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
         setState(state => ({ ...state, notinlist: event.target.checked }));
     };
     const onChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState(state => ({ ...state, accountid: 0, search: event.target.value }));
+        setState(state => ({ ...state, ownerid: null, accountid: null, search: event.target.value }));
     };
 
     useEffect(() => {
@@ -72,36 +74,51 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (direction === 1? "Приём: ": "Отправка: ") + (subtype === "INTERNAL"? "Внешние счета организации": "Внешние счета клиентов") }
+                {`${direction === 1? "Приём:": "Отправка:"} ${subtype === "INTERNAL"? "Внешние счета организации": "Внешние счета клиентов"}`}
             </div>
-            <div className={styles.search}>
-                <Input
-                    prefix={<SearchOutlined style={{ fontSize: "1.25rem", paddingRight: "0.5rem"}}/>}
-                    style={{ fontFamily: 'Roboto', fontSize: "1rem", width: '100%' }}
-                    placeholder="Введите текст для выбора счёта по номеру счёта или названию организации"
-                    allowClear
-                    value={state.search}
-                    onChange={onChangeSearch}
-                />
-            </div>
-            <ul className={styles["owners-list"]}>
-                {
-                    mock_owners
-                        .filter(item => item.name.toUpperCase().includes(state.search.toUpperCase()))
-                        .sort((a, b) => (a.name < b.name)? -1: 1)
-                        .map(item =>
-                            <li className={[styles["owners-item"], state.ownerid === item.id? styles["owners-item-current"]: ""].join(" ")} key={item.id} value={item.name} onClick={() => onCurrencyOwner(item.id)}>
-                                <div>
-                                    {item.name}
-                                </div>
-                            </li>)
-                }
-            </ul>
-            <ul className={styles["accounts-list"]}>
+            {
+                clientid === null?
+                    <div className={styles.search}>
+                        <Input
+                            prefix={<SearchOutlined style={{ fontSize: "1.25rem", paddingRight: "0.5rem"}}/>}
+                            style={{ fontFamily: 'Roboto', fontSize: "1rem", width: '100%' }}
+                            placeholder="Введите текст для выбора развивающего по названию (имени)"
+                            allowClear
+                            value={state.search}
+                            onChange={onChangeSearch}
+                        />
+                    </div>
+                    : null
+            }
+            {
+                clientid === null?
+                    <ul className={styles["owners-list"]}>
+                        {
+                            mock_owners
+                                .filter(item => state.search.length > 0 && item.name.toUpperCase().includes(state.search.toUpperCase()))
+                                .sort((a, b) => (a.name < b.name)? -1: 1)
+                                .map(item =>
+                                    <li
+                                        className={[styles["owners-item"], state.ownerid === item.id? styles["owners-item-current"]: ""].join(" ")}
+                                        key={item.id}
+                                        value={item.name}
+                                        onClick={() => onCurrencyOwner(item.id)}
+                                    >
+                                        <div>
+                                            {item.name}
+                                        </div>
+                                    </li>)
+                        }
+                    </ul>:
+                    <div className={styles["owner"]}>
+                        {`Развивающий: ${clientid}`}
+                    </div>
+            }
+            <ul className={[styles["accounts-list"], clientid === null? styles["accounts-list"]: ""].join(" ")}>
                 {
                     mock_accounts
                         .sort((a, b) => (a.name < b.name)? -1: 1)
-                        .filter(item => item.owner_id === state.ownerid)
+                        .filter(item => state.ownerid === item.owner_id)
                         .map(item =>
                             <li className={[styles["accounts-item"], state.accountid === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.name} onClick={() => onCurrencyAccount(item.id)}>
                                 <div>

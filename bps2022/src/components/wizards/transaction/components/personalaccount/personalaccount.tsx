@@ -5,6 +5,7 @@ import { SearchOutlined } from '@ant-design/icons';
 
 import styles from './personalaccount.module.css';
 import { mock_clients, mock_accounts } from '../../../clients/mock';
+import { Settings } from '../../../../../domain/settings/settings';
 
 type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
@@ -59,7 +60,7 @@ export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
             } else {
                 clicks.current = 1;
             }
-            if (clicks.current > 2) {
+            if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
                 onNext();
                 return;

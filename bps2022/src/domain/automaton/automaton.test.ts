@@ -1,4 +1,4 @@
-import { automaton, WizardPagesTypesUnion, TransactionCharges } from './automaton';
+import { automaton, WizardPagesTypesUnion, TransactionCharges, isRegisterPage } from './automaton';
 
 test('Тестирование автомата транзакций: основных счётов не более двух', () => {
     expect(automaton
@@ -26,7 +26,7 @@ test('Тестирование автомата транзакций: налич
 
                 if ("registration" in page) {
                     if (page.registration) {
-                        if (!(pagenext && (pagenext.type.slice(0, 3) === 'REG'))) {
+                        if (!(pagenext && isRegisterPage(pagenext))) { //(pagenext.type.slice(0, 3) === 'REG'))) {
                             console.log(`Without registration: ${automaton[i][0]} ${j} ${pagenext.type.slice(0, 3)}`)
                             result = false;
                         }
@@ -104,4 +104,62 @@ test('Тестирования списка стоимости обслужив�
         }
     }
     expect(result).toEqual(true);
+});
+test('Тестирование обязательного заполнения clientid при регистрации нового расчётного счёта (организации), если обязателен clientid при выборе расчётного счёта', () => {
+    let result = true;
+    for(let i = 0; i < automaton.length; i++) {
+        const pages = automaton[i][3];
+        if (pages !== null) {
+            for(let j = 0; j < pages.length; j++) {
+                const page = pages[j];
+                if (page.type === "BANKACCOUNT") {
+                    if (page.registration) {
+                        const regpage1 = pages[j + 1]
+                        if (regpage1.type === "REGBANKACCOUNT") {
+                            if (page.client !== regpage1.client) {
+                                result = false;
+                            }
+                        }
+                        const regpage2 = pages[j + 2]
+                        if (regpage2.type === "REGORGANIZATION") {
+                            if (page.client !== regpage2.client) {
+                                result = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    expect(result).toEqual(true);
+});
+test('Тестирование признаков автоматического выполнения для фантомных транзакций', () => {
+    const result = automaton
+        .filter(transaction => transaction[3] === null)
+        .map(phantom => {
+            const transaction = automaton.filter(transaction => transaction[0] === phantom[1])[0];
+            if (transaction[4] !== phantom[4]) {
+                console.log(`Phantom: ${phantom[0]} Transaction: ${transaction[0]}`);
+                return false;
+            }
+            return true;
+        })
+        .filter(item => !item)
+        .length;
+    expect(result).toEqual(0);
+});
+test('Тестирование соответствия описаний фантомных транзакций описаниям основных транзакций', () => {
+    const result = automaton
+        .filter(transaction => transaction[3] === null)
+        .map(phantom => {
+            const transaction = automaton.filter(transaction => transaction[0] === phantom[1])[0];
+            if (transaction[5] !== phantom[5]) {
+                console.log(`Phantom: ${phantom[0]} Transaction: ${transaction[0]}`);
+                return false;
+            }
+            return true;
+        })
+        .filter(item => !item)
+        .length;
+    expect(result).toEqual(0);
 });

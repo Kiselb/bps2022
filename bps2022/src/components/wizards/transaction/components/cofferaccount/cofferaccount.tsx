@@ -5,6 +5,7 @@ import { SearchOutlined } from '@ant-design/icons';
 
 import { mock } from './mock';
 import styles from './cofferaccount.module.css';
+import { Settings } from '../../../../../domain/settings/settings';
 
 type Props = {
     direction: -1 | 1,
@@ -45,7 +46,7 @@ export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, on
             } else {
                 clicks.current = 1;
             }
-            if (clicks.current > 2) {
+            if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
                 onNext();
                 return;

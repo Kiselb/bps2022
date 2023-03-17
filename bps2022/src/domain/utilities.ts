@@ -55,3 +55,7 @@ export const isBankSecondaryAccount = (value: string): boolean => {
 export const isBIK = (value: string): boolean => {
     return (/^\d{9}$/.test(value));
 }
+
+export const isPalindrome = (s: string, i: number): boolean => {
+    return (i = i || 0) < 0 || i >= s.length >> 1 || s[i] == s[s.length - 1 - i] && isPalindrome(s, ++i);
+}

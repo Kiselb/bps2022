@@ -10,6 +10,7 @@ import styles from './registration.module.css';
 export type Props = {
     context: "SENDER" | "RECEIVER" | "NONE",
     subtype: "INTERNAL" | "EXTERNAL",
+    client: boolean,
     savedstate: State | null,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
@@ -23,11 +24,12 @@ export type State = {
     city: string,
     currency: string,
     organizationid: number,
+    clientid: number | null,
     notinlist: boolean,
     search: string,
 };
 
-const validate = (state: State) => {
+const validate = (state: State, client: boolean) => {
     return (
         true
         && state.primaryno.length > 0
@@ -36,11 +38,14 @@ const validate = (state: State) => {
         && state.bik.length > 0
         && state.city.length > 0
         && state.currency.length > 0
-        && (state.notinlist || (!state.notinlist && state.organizationid > 0))
+        && (state.notinlist
+            || (!state.notinlist && state.organizationid > 0 && client && state.clientid !== null)
+            || (!state.notinlist && state.organizationid > 0 && !client && state.clientid === null)
+        )
     );
 };
 
-export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady, onDirty }) => {
+export const Registration: FC<Props> = ({ context, subtype, client, savedstate, onReady, onDirty }) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
@@ -51,6 +56,7 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady,
             bik: "",
             city: "",
             currency: "RUB",
+            clientid: 0,
             organizationid: 0,
             notinlist: false,
             search: "",
@@ -78,15 +84,15 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady,
     const onInlist = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, notinlist: event.target.checked }));
     };
-    const onOrganization = (id: number) => {
-        setState(state => ({ ...state, organizationid: id }));
+    const onOrganization = (organizationid: number, clientid: number | null) => {
+        setState(state => ({ ...state, organizationid, clientid: client? clientid: null }));
     };
     const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, search: event.target.value }));
     };
 
     useEffect(() => {
-        validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
+        validate(state, client)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
     }, [state]);
 
     const styleinput: CSSProperties = { width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" };
@@ -152,9 +158,17 @@ export const Registration: FC<Props> = ({ context, subtype, savedstate, onReady,
                     .filter(item => (state.search.length > 3 && item.inn.includes(state.search)))
                     .sort((a, b) => (a.organization < b.organization)? -1: 1)
                     .map(item =>
-                        <li className={[styles["organizations-item"], state.organizationid === item.id? (state.notinlist? "": styles["organizations-item-current"]): "", state.notinlist? styles["organizations-disabled"]: ""].join(" ")} key={item.id} value={item.id} onClick={() => onOrganization(item.id)}>
+                        <li
+                            className={[styles["organizations-item"], state.organizationid === item.id? (state.notinlist? "": styles["organizations-item-current"]): "", state.notinlist? styles["organizations-disabled"]: ""].join(" ")}
+                            key={item.id}
+                            value={item.id}
+                            onClick={() => onOrganization(item.id, item.clientid)}
+                        >
                             <div>
                                 {item.inn}
+                            </div>
+                            <div>
+                                {item.clientid}
                             </div>
                             <div>
                                 {item.organization}

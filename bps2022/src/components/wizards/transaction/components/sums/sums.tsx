@@ -11,6 +11,7 @@ import { Decimal } from '../../../../decimal/decimal';
 
 import styles from './sums.module.css';
 import { mock } from './mock';
+import { Settings } from '../../../../../domain/settings/settings';
 
 type Props = {
     exchange: boolean,
@@ -42,8 +43,8 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady, onDirty }: Prop
             type: "SUMEXCHANGE",
             originvalue: 0,
             targetvalue: 0,
-            origincurrency: "RUB",
-            targetcurrency: "RUB",
+            origincurrency: Settings.currencies.defaultOrigin,
+            targetcurrency: Settings.currencies.defaultTarget,
             rate: 1,
             exchange,
             lock: 1,

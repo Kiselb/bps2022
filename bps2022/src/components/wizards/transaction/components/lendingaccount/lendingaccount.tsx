@@ -2,6 +2,7 @@ import React, { FC, useState, useEffect, useRef } from 'react';
 
 import { mock } from './mock';
 import styles from './lendingaccount.module.css';
+import { Settings } from '../../../../../domain/settings/settings';
 
 export type Props = {
     clientid: number | null,
@@ -42,7 +43,7 @@ export const LendingAccount: FC<Props> = ({ clientid, direction, regallowed, sav
             } else {
                 clicks.current = 1;
             }
-            if (clicks.current > 2) {
+            if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
                 onNext();
                 return;

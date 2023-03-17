@@ -31,9 +31,9 @@ export const Narrowing: FC<Props> = ({ origin, target, transaction, onTransactio
                                 <div className={[styles["transaction-item-marker"], currency === item[0]? styles["transactions-item-current"]: ""].join(' ')} onClick={() => onCurrency(item[0])}>
                                     <div>{index + 1}</div>
                                 </div>
-                                <li className={[styles["transactions-item"], currency === item[0]? styles["transactions-item-current"]: ""].join(" ")} value={item[4]} onClick={() => onCurrency(item[0])}>
+                                <li className={[styles["transactions-item"], currency === item[0]? styles["transactions-item-current"]: ""].join(" ")} value={item[5]} onClick={() => onCurrency(item[0])}>
                                     <div>
-                                        {item[4]}
+                                        {item[5]}
                                     </div>
                                 </li>
                             </div>)

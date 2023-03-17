@@ -3,6 +3,8 @@ import React, { FC, useState, useEffect, useRef } from 'react';
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
+import { Settings } from '../../../../../domain/settings/settings';
+
 import styles from './bankaccount.module.css';
 import { mock } from './mock';
 
@@ -12,26 +14,34 @@ type Props = {
     primary: boolean,
     regallowed: boolean,
     savedstate: State | null,
+    client: boolean,
     onReady: (state: State, registration: boolean) => void,
     onDirty: (state: State) => void,
     onNext: () => void,
 };
 export type State = {
     type: "BANKACCOUNT",
-    accountid: number,
+    clientid: number | null,
+    accountid: number | null,
     notinlist: boolean,
     search: string,
 };
-const validate = (state: State): boolean => {
-    return ((state.notinlist) || (!state.notinlist && state.accountid > 0));
+const validate = (state: State, subtype: "INTERNAL" | "EXTERNAL", client: boolean): boolean => {
+    return (
+        state.notinlist
+        || (subtype === "INTERNAL" && !state.notinlist && state.accountid !== null)
+        || (subtype === "EXTERNAL" && client && state.clientid !== null && !state.notinlist && state.accountid !== null)
+        || (subtype === "EXTERNAL" && !client && state.clientid === null && !state.notinlist && state.accountid !== null)
+    );
 };
 
-export const BankAccount: FC<Props> = ({ subtype, direction, savedstate, regallowed, onReady, onDirty, onNext }: Props) => {
+export const BankAccount: FC<Props> = ({ subtype, direction, savedstate, regallowed, client, onReady, onDirty, onNext }: Props) => {
     const [state, setState] = useState<State>(
         savedstate === null?
         {
             type: "BANKACCOUNT",
-            accountid: -1,
+            clientid: null,
+            accountid: null,
             notinlist: false,
             search: "",
         }
@@ -39,30 +49,30 @@ export const BankAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
     );
     const clicks = useRef(1);
 
-    const onCurrency = (accountid: number) => {
+    const onCurrency = (accountid: number, clientid: number | null) => {
         if (!state.notinlist) {
             if (accountid === state.accountid) {
                 clicks.current += 1;
             } else {
                 clicks.current = 1;
             }
-            if (clicks.current > 2) {
+            if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
                 onNext();
                 return;
             }
-            setState(state => ({ ...state, accountid }));
+            setState(state => ({ ...state, accountid, clientid: client? clientid: null }));
         }
     };
     const onChangeInList = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, notinlist: event.target.checked }));
     };
     const onChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState(state => ({ ...state, accountid: 0, search: event.target.value }));
+        setState(state => ({ ...state, accountid: null, search: event.target.value }));
     };
 
     useEffect(() => {
-        validate(state)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
+        validate(state, subtype, client)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
     }, [state]);
 
     return (
@@ -87,11 +97,19 @@ export const BankAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
                         .filter(item => state.search.length > 0 && (item.account.includes(state.search) || item.organization.toUpperCase().includes(state.search.toUpperCase())))
                         .sort((a, b) => (a.organization < b.organization)? -1: 1)
                         .map(item =>
-                            <li className={[styles["accounts-item"], state.accountid === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.account} onClick={() => onCurrency(item.id)}>
-                                <div>
+                            <li
+                                className={[styles["accounts-item"], state.accountid === item.id? styles["accounts-item-current"]: ""].join(" ")}
+                                key={item.id}
+                                value={item.account}
+                                onClick={() => onCurrency(item.id, item.clientid)}
+                            >
+                                <div className={styles["account-item-account"]}>
                                     {item.account}
                                 </div>
-                                <div>
+                                <div className={styles["account-item-client"]}>
+                                    {subtype === "EXTERNAL"? item.clientid : ""}
+                                </div>
+                                <div className={styles["account-item-organization"]}>
                                     {item.organization}
                                 </div>
                             </li>)

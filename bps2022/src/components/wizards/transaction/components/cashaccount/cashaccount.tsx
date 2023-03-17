@@ -5,6 +5,7 @@ import { SearchOutlined } from '@ant-design/icons';
 
 import styles from './cashaccount.module.css';
 import { mock } from './mock';
+import { Settings } from '../../../../../domain/settings/settings';
 
 type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
@@ -46,7 +47,7 @@ export const CashAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
             } else {
                 clicks.current = 1;
             }
-            if (clicks.current > 2) {
+            if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
                 onNext();
                 return;

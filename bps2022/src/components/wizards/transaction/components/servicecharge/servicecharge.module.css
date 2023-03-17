@@ -2,11 +2,11 @@
     display: grid;
     grid-template-rows: auto auto auto auto auto auto auto 1fr;
     grid-template-columns: auto auto auto 1fr;
+    row-gap: 1rem;
     width: 100%;
     height: 100%;
-    padding-bottom: 2rem;
+    padding-bottom: 1rem;
     column-gap: 0.5rem;
-    row-gap: 1rem;
 }
 .header {
     grid-row-start: 1;
@@ -28,103 +28,103 @@
     white-space: nowrap;
 }
 .enterprise-external-income-label {
-    grid-row-start: 2;
+    grid-row-start: 3;
     grid-column-start: 1;
 }
 .enterprise-external-income-value {
-    grid-row-start: 2;
+    grid-row-start: 3;
     grid-column-start: 2;
 }
 .enterprise-external-income-option1 {
-    grid-row-start: 2;
+    grid-row-start: 3;
     grid-column-start: 3;
 }
 .enterprise-external-income-option2 {
-    grid-row-start: 2;
+    grid-row-start: 3;
     grid-column-start: 4;
 }
 
 .enterprise-external-outcome-label {
-    grid-row-start: 3;
+    grid-row-start: 2;
     grid-column-start: 1;
 }
 .enterprise-external-outcome-value {
-    grid-row-start: 3;
+    grid-row-start: 2;
     grid-column-start: 2;
 }
 .enterprise-external-outcome-option1 {
-    grid-row-start: 3;
+    grid-row-start: 2;
     grid-column-start: 3;
 }
 .enterprise-external-outcome-option2 {
-    grid-row-start: 3;
+    grid-row-start: 2;
     grid-column-start: 4;
 }
 
 .personal-income-label {
-    grid-row-start: 4;
+    grid-row-start: 5;
     grid-column-start: 1;
 }
 .personal-income-value {
-    grid-row-start: 4;
+    grid-row-start: 5;
     grid-column-start: 2;
 }
 .personal-income-option1 {
-    grid-row-start: 4;
+    grid-row-start: 5;
     grid-column-start: 3;
 }
 .personal-income-option2 {
-    grid-row-start: 4;
+    grid-row-start: 5;
     grid-column-start: 4;
 }
 
 .personal-outcome-label {
-    grid-row-start: 5;
+    grid-row-start: 4;
     grid-column-start: 1;
 }
 .personal-outcome-value {
-    grid-row-start: 5;
+    grid-row-start: 4;
     grid-column-start: 2;
 }
 .personal-outcome-option1 {
-    grid-row-start: 5;
+    grid-row-start: 4;
     grid-column-start: 3;
 }
 .personal-outcome-option2 {
-    grid-row-start: 5;
+    grid-row-start: 4;
     grid-column-start: 4;
 }
 
 .personal-netting-income-label {
-    grid-row-start: 6;
+    grid-row-start: 7;
     grid-column-start: 1;
 }
 .personal-netting-income-value {
-    grid-row-start: 6;
+    grid-row-start: 7;
     grid-column-start: 2;
 }
 .personal-netting-income-option1 {
-    grid-row-start: 6;
+    grid-row-start: 7;
     grid-column-start: 3;
 }
 .personal-netting-income-option2 {
-    grid-row-start: 6;
+    grid-row-start: 7;
     grid-column-start: 4;
 }
 
 .personal-netting-outcome-label {
-    grid-row-start: 7;
+    grid-row-start: 6;
     grid-column-start: 1;
 }
 .personal-netting-outcome-value {
-    grid-row-start: 7;
+    grid-row-start: 6;
     grid-column-start: 2;
 }
 .personal-netting-outcome-option1 {
-    grid-row-start: 7;
+    grid-row-start: 6;
     grid-column-start: 3;
 }
 .personal-netting-outcome-option2 {
-    grid-row-start: 7;
+    grid-row-start: 6;
     grid-column-start: 4;
 }

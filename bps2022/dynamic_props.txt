@@ -1,0 +1,35 @@
+    const getDynamicProps = (states: Map<string, WizardStageState>, history: string[], sources: TransactionComponentDependency[]): { [key: string]: string | number | boolean | null } => {
+        const result: { [key: string]: string | number | boolean | null } = {};
+        
+        for(let i = 0; i < sources.length; i++) {
+            nextsource: for(let j = 0; j < sources[i].path.length; j++) {
+                for(let k = 0; k < history.length; k++) {
+                    if (sources[i].path[j].identity === history[k]) {
+                        const identity = sources[i].path[j].identity;
+                        const propsource: keyof WizardStageState = sources[i].path[j].source as (keyof WizardStageState); // refactoring required
+                        const propdestination = sources[i].destination;
+                        const statesaved = states.get(identity);
+
+                        if (statesaved) {
+                            result[propdestination] = statesaved[propsource];
+                        } else {
+                            result[propdestination] = null;
+                        }
+                        break nextsource;
+                    }
+                }
+            }
+        }
+        return result;
+    };
+
+export type WizardStageStateKeys = TypeKeys<WizardStageState>;
+export type TransactionComponentDependency = {
+    mode: "EARLY" | "LATE",
+    destination: WizardStageStateKeys,                // Имя целевого свойства компонента, которое будет передано в компонент (keyof TransactionStatesUnion?)
+    path: {                                                             // Пути получения значения целевого свойства
+        identity: string,                                               // Идентификатор шага транзакции, в состоянии которого, задано значение целевого свойства
+        source: WizardStageStateKeys,                    // Имя поля состояния, значение которого, будет передано в целевое свойство
+    }[],
+};
+export type WizardStageConstraints = WizardStageStateKeys[];

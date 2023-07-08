@@ -9,15 +9,14 @@ import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { round } from '../../../../../domain/utilities';
 import { Decimal } from '../../../../decimal/decimal';
 
+import { Settings } from '../../../../../domain/settings/settings';
+import { WizardCommonProps, WizardStateProps, } from '../../../../../domain/transactions/types';
+
 import styles from './sums.module.css';
 import { mock } from './mock';
-import { Settings } from '../../../../../domain/settings/settings';
 
-type Props = {
+export type Props = {
     exchange: boolean,
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
 };
 export type State = {
     type: "SUMEXCHANGE",
@@ -36,9 +35,9 @@ const validate = (state: State): boolean => {
     );
 };
 
-export const Sums: FC<Props> = ({ exchange, savedstate, onReady, onDirty }: Props) => {
+export const Sums: FC<Props & WizardCommonProps & WizardStateProps> = ({ exchange, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "SUMEXCHANGE",
             originvalue: 0,
@@ -49,7 +48,7 @@ export const Sums: FC<Props> = ({ exchange, savedstate, onReady, onDirty }: Prop
             exchange,
             lock: 1,
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
 
     const onOriginCurrency = (origincurrency: string) => {

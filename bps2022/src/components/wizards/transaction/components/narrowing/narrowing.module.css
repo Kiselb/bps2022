@@ -44,6 +44,8 @@
     background-color: #cfcfcf;
     height: 4.25rem;
     width: 4.25rem;
+    min-height: 4.25rem;
+    min-width: 4.25rem;
     font-size: 1.25rem;
     border-radius: 50%;
 }

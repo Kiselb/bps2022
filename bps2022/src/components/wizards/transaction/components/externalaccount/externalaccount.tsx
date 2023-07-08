@@ -3,47 +3,48 @@ import React, { FC, useState, useEffect, useRef } from 'react';
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
+import { WizardCommonProps, WizardStateProps, AccountOwner, WizardStageCharges } from '../../../../../domain/transactions/types';
+
 import styles from './externalaccount.module.css';
 import { mock_owners, mock_accounts } from './mock';
 import { Settings } from '../../../../../domain/settings/settings';
 
-type Props = {
+export type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
-    direction: -1 | 1,
-    primary: boolean,
-    regallowed: boolean,
-    clientid: number | null,
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
-    onNext: () => void,
+    balance: "WITHDRAWAL" | "ACCRUAL" | "NONE",
+    position: "PRIMARY" | "SECONDARY" | "NONE",
+    suspense: boolean,
+    owner: AccountOwner,
+    charge: WizardStageCharges,
 };
+
 export type State = {
     type: "EXTERNALACCOUNT",
-    ownerid: number | null,
+    clientid: number | null,
     accountid: number | null,
     notinlist: boolean,
     search: string,
 };
 const validate = (state: State): boolean => {
-    return ((state.notinlist) || (!state.notinlist && (state.ownerid !== null) && (state.accountid !== null)));
+    return ((state.notinlist) || (!state.notinlist && (state.clientid !== null) && (state.accountid !== null)));
 }
-export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, savedstate, clientid, onReady, onDirty, onNext }: Props) => {
+export const ExternalAccount: FC<Props & WizardCommonProps & WizardStateProps> = ({ subtype, balance, suspense, savedstate, owner, onReady, onDirty, onNexty, getParam }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "EXTERNALACCOUNT",
-            ownerid: clientid,
+            clientid: null,
             accountid: null,
             notinlist: false,
             search: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
+    const clientid = ((balance === "WITHDRAWAL"? getParam("ORIGINCLIENTID"): (balance === "ACCRUAL"? getParam("TARGETCLIENTID"): getParam("CLIENTID")))) as number | null;
     const clicks = useRef(1);
 
-    const onCurrencyOwner = (ownerid: number) => {
-        setState((state) => ({ ...state, ownerid }))
+    const onCurrencyOwner = (clientid: number) => {
+        setState((state) => ({ ...state, clientid }))
     };
     const onCurrencyAccount = (accountid: number) => {
         if (!state.notinlist) {
@@ -54,7 +55,7 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
             }
             if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
-                onNext();
+                onNexty();
                 return;
             }
             setState(state => ({ ...state, accountid }));
@@ -64,7 +65,7 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
         setState(state => ({ ...state, notinlist: event.target.checked }));
     };
     const onChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setState(state => ({ ...state, ownerid: null, accountid: null, search: event.target.value }));
+        setState(state => ({ ...state, clientid: null, accountid: null, search: event.target.value }));
     };
 
     useEffect(() => {
@@ -74,7 +75,7 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                {`${direction === 1? "Приём:": "Отправка:"} ${subtype === "INTERNAL"? "Внешние счета организации": "Внешние счета клиентов"}`}
+                {`${balance === "ACCRUAL"? "Приём:": (balance === "WITHDRAWAL"? "Отправка:": "")} ${subtype === "INTERNAL"? "Внешние счета организации": "Внешние счета клиентов"}`}
             </div>
             {
                 clientid === null?
@@ -99,7 +100,7 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
                                 .sort((a, b) => (a.name < b.name)? -1: 1)
                                 .map(item =>
                                     <li
-                                        className={[styles["owners-item"], state.ownerid === item.id? styles["owners-item-current"]: ""].join(" ")}
+                                        className={[styles["owners-item"], state.clientid === item.id? styles["owners-item-current"]: ""].join(" ")}
                                         key={item.id}
                                         value={item.name}
                                         onClick={() => onCurrencyOwner(item.id)}
@@ -118,7 +119,7 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
                 {
                     mock_accounts
                         .sort((a, b) => (a.name < b.name)? -1: 1)
-                        .filter(item => state.ownerid === item.owner_id)
+                        .filter(item => state.clientid === item.owner_id)
                         .map(item =>
                             <li className={[styles["accounts-item"], state.accountid === item.id? styles["accounts-item-current"]: ""].join(" ")} key={item.id} value={item.name} onClick={() => onCurrencyAccount(item.id)}>
                                 <div>
@@ -128,7 +129,7 @@ export const ExternalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
                 }
             </ul>
             {
-                regallowed?
+                suspense?
                     <div className={styles["accounts-not-in-list"]}>
                         <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
                         <div>Счёт в списке отсутствует</div>

@@ -5,14 +5,12 @@ import { SearchOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 
 import { isDecimal } from '../../../../../domain/utilities';
-import { mock } from '../../../transaction/components/bankaccount/mock';
-import styles from './registration.module.css';
+import { WizardCommonProps, WizardStateProps, AccountOwner, } from '../../../../../domain/transactions/types';
 
-export type Props = {
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
-};
+import styles from './registration.module.css';
+import { mock } from '../../../transaction/components/bankaccount/mock';
+
+export type Props = Record<string, unknown>;
 export type State = {
     type: "REGOVERDRAFT",
     accountid: number,
@@ -31,9 +29,9 @@ const validate = (state: State) => {
     );
 };
 
-export const Registration: FC<Props> = ({ savedstate, onReady, onDirty }) => {
+export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "REGOVERDRAFT",
             accountid: 0,
@@ -41,7 +39,7 @@ export const Registration: FC<Props> = ({ savedstate, onReady, onDirty }) => {
             expired: null,
             search: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
 
     const onAccount = (accountid: number) => {

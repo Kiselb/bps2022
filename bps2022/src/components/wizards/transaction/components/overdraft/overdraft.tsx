@@ -3,19 +3,18 @@ import React, { FC, useState, useEffect, useRef } from 'react';
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
-import { mock } from './mock';
-import styles from './overdraft.module.css';
 import { Settings } from '../../../../../domain/settings/settings';
+import { WizardCommonProps, WizardStateProps, AccountOwner } from '../../../../../domain/transactions/types';
 
-type Props = {
-    direction: -1 | 1,
-    primary: boolean,
-    savedstate: State | null,
-    regallowed: boolean,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
-    onNext: () => void,
+import styles from './overdraft.module.css';
+import { mock } from './mock';
+
+export type Props = {
+    balance: "WITHDRAWAL" | "ACCRUAL",
+    position: "PRIMARY" | "SECONDARY",
+    suspense: boolean,
 };
+
 export type State = {
     type: "OVERDRAFT",
     overdraftid: number,
@@ -28,9 +27,9 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.overdraftid > 0));
 };
 
-export const Overdraft: FC<Props> = ({ direction, savedstate, regallowed, onReady, onDirty, onNext }) => {
+export const Overdraft: FC<Props & WizardCommonProps & WizardStateProps> = ({ balance, savedstate, suspense, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "OVERDRAFT",
             overdraftid: 0,
@@ -39,7 +38,7 @@ export const Overdraft: FC<Props> = ({ direction, savedstate, regallowed, onRead
             notinlist: false,
             search: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
     const clicks = useRef(1);
 
@@ -52,7 +51,7 @@ export const Overdraft: FC<Props> = ({ direction, savedstate, regallowed, onRead
             }
             if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
-                onNext();
+                onNexty();
                 return;
             }
             setState(state => ({ ...state, overdraftid, regularaccount, overdraftaccount }));
@@ -72,7 +71,7 @@ export const Overdraft: FC<Props> = ({ direction, savedstate, regallowed, onRead
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                {"Выбор Овердрафта " + (direction? "для погашения": "для заимствования")}
+                {"Выбор Овердрафта " + (balance === "WITHDRAWAL"? "для погашения": "для заимствования")}
             </div>
             <div className={styles.search}>
                 <Input
@@ -117,7 +116,7 @@ export const Overdraft: FC<Props> = ({ direction, savedstate, regallowed, onRead
                 }
             </ul>
             {
-                regallowed?
+                suspense?
                     <div className={styles["overdrafts-not-in-list"]}>
                         <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
                         <div>Овердрафт в списке отсутствует</div>

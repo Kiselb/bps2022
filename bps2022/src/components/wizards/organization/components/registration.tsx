@@ -2,17 +2,17 @@ import React, { FC, useState, useEffect, CSSProperties } from 'react';
 
 import { Input } from 'antd';
 
+import { AccountOwner, WizardCommonProps, WizardStateProps, } from '../../../../domain/transactions/types';
+
 import { mock_clients } from '../../clients/mock';
 import styles from './registration.module.css';
 
 export type Props = {
-    context: "SENDER" | "RECEIVER" | "NONE",
+    balance: "WITHDRAWAL" | "ACCRUAL" | "NONE",
     subtype: "INTERNAL" | "EXTERNAL",
-    client: boolean,
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
+    owner: AccountOwner,
 };
+
 export type State = {
     type: "REGORGANIZATION",
     name: string,
@@ -24,7 +24,7 @@ export type State = {
     search: string,
 };
 
-const validate = (state: State, client: boolean, subtype: "INTERNAL" | "EXTERNAL") => {
+const validate = (state: State, client: AccountOwner, subtype: "INTERNAL" | "EXTERNAL") => {
     console.log(`${subtype} ${client} ${state.notbelongs} ${state.clientid}`);
     return (
         true
@@ -41,9 +41,9 @@ const validate = (state: State, client: boolean, subtype: "INTERNAL" | "EXTERNAL
     );
 };
 
-export const Registration: FC<Props> = ({ context, subtype, client, savedstate, onReady, onDirty }) => {
+export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ balance, subtype, owner, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "REGORGANIZATION",
             name: "",
@@ -54,7 +54,7 @@ export const Registration: FC<Props> = ({ context, subtype, client, savedstate, 
             clientid: 0,
             search: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
     const onName = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, name: event.target.value }));
@@ -79,8 +79,8 @@ export const Registration: FC<Props> = ({ context, subtype, client, savedstate, 
     };
 
     useEffect(() => {
-        console.log(state, client, subtype);
-        validate(state, client, subtype)? onReady({ ...state }, false): onDirty({ ...state });
+        console.log(state, owner, subtype);
+        validate(state, owner, subtype)? onReady({ ...state }, false): onDirty({ ...state });
     }, [state]);
 
     const styleinput: CSSProperties = { width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" };
@@ -88,7 +88,7 @@ export const Registration: FC<Props> = ({ context, subtype, client, savedstate, 
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (context === "SENDER"? "Отправитель: ": (context === "RECEIVER"? "Получатель: ": "")) + (subtype === "INTERNAL"? "Регистрация внутренней организации": "Регистрация внешней организации")}
+                { (balance === "WITHDRAWAL"? "Отправитель: ": (balance === "ACCRUAL"? "Получатель: ": "")) + (subtype === "INTERNAL"? "Регистрация внутренней организации": "Регистрация внешней организации")}
             </div>
             <div className={styles["name-label"]}>
                 <label>Название:</label>
@@ -115,7 +115,7 @@ export const Registration: FC<Props> = ({ context, subtype, client, savedstate, 
                 <Input style={styleinput} onChange={onOGRN} defaultValue="" value={state.ogrn}/>
             </div>
             {
-                subtype === "EXTERNAL" && !client?
+                subtype === "EXTERNAL" && !owner?
                     <div className={styles["organizations-belongs-client"]}>
                         <input type="checkbox" onChange={onChangeBelongsClient} checked={state.notbelongs}></input>
                         <div>Организация никому не принадлежит</div>
@@ -123,7 +123,7 @@ export const Registration: FC<Props> = ({ context, subtype, client, savedstate, 
                     : null
             }
             {
-                subtype === "EXTERNAL" && (!state.notbelongs || client)?
+                subtype === "EXTERNAL" && (!state.notbelongs || owner)?
                     <>
                         <div className={styles["clients-list-label"]}>
                             <label>Клиент:</label>

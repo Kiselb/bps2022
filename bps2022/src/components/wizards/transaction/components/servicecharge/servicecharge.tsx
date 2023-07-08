@@ -4,51 +4,50 @@ import { Checkbox } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 import { Settings } from '../../../../../domain/settings/settings';
-import { TransactionCharges } from '../../../../../domain/automaton/automaton';
+import { WizardCommonProps, WizardStateProps, WizardStageCharges } from '../../../../../domain/transactions/types';
+
 import { Decimal } from '../../../../decimal/decimal';
 
 import styles from './servicecharge.module.css';
 
-type Props = {
-    charges: TransactionCharges[],
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
+export type Props = {
+    charges: WizardStageCharges[],
 };
+
 export type Charge = {
-    charge: number,
+    charge: number | null,
     isabsolute: boolean,
     isincluded: boolean,
-    isallowed: boolean,
 }
-export type Charges = {[key in TransactionCharges]: Charge}
+export type Charges = {[key in WizardStageCharges]: Charge}
 
 export type State = {
     type: "SERVICECHARGE",
     charges: Charges,
 };
+
 const validate = (state: State): boolean => {
     return (state !== null);
 };
 
-export const ServiceCharge: FC<Props> = ({ charges, savedstate, onReady, onDirty }) => {
+export const ServiceCharge: FC<Props & WizardCommonProps & WizardStateProps> = ({ charges, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(() => {
-        if (savedstate === null) {
+        if ((savedstate as State | null) === null) {
             const chargeslist: Charges = {
-                CLIENTPERSONALINCOME: { charge: 0, isabsolute: false, isincluded: false, isallowed: false },
-                CLIENTPERSONALOUTCOME: { charge: 0, isabsolute: false, isincluded: false, isallowed: false },
-                CLIENTPERSONALINCOMENETTING: { charge: 0, isabsolute: false, isincluded: false, isallowed: false },
-                CLIENTPERSONALOUTCOMENETTING: { charge: 0, isabsolute: false, isincluded: false, isallowed: false },
-                ENTERPRISEEXTERNALINCOME: { charge: 0, isabsolute: false, isincluded: false, isallowed: false },
-                ENTERPRISEEXTERNALOUTCOME: { charge: 0, isabsolute: false, isincluded: false, isallowed: false },
+                CLIENTPERSONALINCOME: { charge: null, isabsolute: false, isincluded: false },
+                CLIENTPERSONALOUTCOME: { charge: null, isabsolute: false, isincluded: false },
+                CLIENTPERSONALINCOMENETTING: { charge: null, isabsolute: false, isincluded: false },
+                CLIENTPERSONALOUTCOMENETTING: { charge: null, isabsolute: false, isincluded: false },
+                ENTERPRISEEXTERNALINCOME: { charge: null, isabsolute: false, isincluded: false },
+                ENTERPRISEEXTERNALOUTCOME: { charge: null, isabsolute: false, isincluded: false },
             };
     
             for(let i = 0; i < charges.length; i++) {
-                chargeslist[charges[i]].isallowed = true;
+                chargeslist[charges[i]].charge = 0;
             }
             return ({ type: "SERVICECHARGE", charges: chargeslist });
         }
-        return { ...savedstate };
+        return { ...(savedstate as State) };
     });
 
     useEffect(() => {
@@ -120,7 +119,7 @@ export const ServiceCharge: FC<Props> = ({ charges, savedstate, onReady, onDirty
                 Определение стоимости обслуживания
             </div>
             {
-                state.charges.ENTERPRISEEXTERNALOUTCOME.isallowed?
+                state.charges.ENTERPRISEEXTERNALOUTCOME.charge !== null?
                     <>
                         <div className={[styles["enterprise-external-outcome-label"], styles["element"]].join(" ")}>
                             <label>Отправка с внешнего счёта:</label>
@@ -152,7 +151,7 @@ export const ServiceCharge: FC<Props> = ({ charges, savedstate, onReady, onDirty
                     : null
             }
             {
-                state.charges.ENTERPRISEEXTERNALINCOME.isallowed?
+                state.charges.ENTERPRISEEXTERNALINCOME.charge !== null?
                     <>
                         <div className={[styles["enterprise-external-income-label"], styles["element"]].join(" ")}>
                             <label>Приём на внешний счёт:</label>
@@ -184,7 +183,7 @@ export const ServiceCharge: FC<Props> = ({ charges, savedstate, onReady, onDirty
                     : null
             }
             {
-                state.charges.CLIENTPERSONALOUTCOME.isallowed?
+                state.charges.CLIENTPERSONALOUTCOME.charge !== null?
                     <>
                         <div className={[styles["personal-outcome-label"], styles["element"]].join(" ")}>
                             <label>Отправка по заявке:</label>
@@ -217,7 +216,7 @@ export const ServiceCharge: FC<Props> = ({ charges, savedstate, onReady, onDirty
                     : null
             }
             {
-                state.charges.CLIENTPERSONALINCOME.isallowed?
+                state.charges.CLIENTPERSONALINCOME.charge !== null?
                     <>
                         <div className={[styles["personal-income-label"], styles["element"]].join(" ")}>
                             <label>Приём по заявке:</label>
@@ -250,7 +249,7 @@ export const ServiceCharge: FC<Props> = ({ charges, savedstate, onReady, onDirty
                     : null
             }
             {
-                state.charges.CLIENTPERSONALOUTCOMENETTING.isallowed?
+                state.charges.CLIENTPERSONALOUTCOMENETTING.charge !== null?
                     <>
                         <div className={[styles["personal-netting-outcome-label"], styles["element"]].join(" ")}>
                             <label>Взаимозачёт отправка:</label>
@@ -282,7 +281,7 @@ export const ServiceCharge: FC<Props> = ({ charges, savedstate, onReady, onDirty
                     : null
             }
             {
-                state.charges.CLIENTPERSONALINCOMENETTING.isallowed?
+                state.charges.CLIENTPERSONALINCOMENETTING.charge !== null?
                     <>
                         <div className={[styles["personal-netting-income-label"], styles["element"]].join(" ")}>
                             <label>Взаимозачёт приём:</label>

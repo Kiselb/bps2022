@@ -2,14 +2,14 @@ import React, { FC, useState, useEffect } from 'react';
 
 import { Input } from 'antd';
 
+import { WizardCommonProps, WizardStateProps, AccountOwner, } from '../../../domain/transactions/types';
+
 import styles from './registration.module.css';
 
 export type Props = {
     subtype: "INCOME" | "EXPENSES",
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
 };
+
 export type State = {
     type: "REGARTICLE",
     name: string,
@@ -20,14 +20,14 @@ const validate = (state: State, subtype: "INCOME" | "EXPENSES") => {
     if (subtype === "EXPENSES") return ( true && state.name.length > 0 );
 };
 
-export const Registration: FC<Props> = ({ subtype, savedstate, onReady, onDirty }) => {
+export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ subtype, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setStae] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "REGARTICLE",
             name: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
 
     const onName = (event: React.ChangeEvent<HTMLInputElement>) => {

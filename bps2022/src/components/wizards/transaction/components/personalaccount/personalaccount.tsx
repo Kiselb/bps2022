@@ -3,20 +3,21 @@ import React, { FC, useState, useEffect, useRef } from 'react';
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
+import { Settings } from '../../../../../domain/settings/settings';
+import { WizardCommonProps, WizardStateProps, AccountOwner, WizardStageCharges } from '../../../../../domain/transactions/types';
+
 import styles from './personalaccount.module.css';
 import { mock_clients, mock_accounts } from '../../../clients/mock';
-import { Settings } from '../../../../../domain/settings/settings';
 
-type Props = {
+export type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
-    direction: -1 | 1,
-    primary: boolean,
-    regallowed: boolean,
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
-    onNext: () => void,
+    balance: "WITHDRAWAL" | "ACCRUAL",
+    position: "PRIMARY" | "SECONDARY",
+    suspense: boolean,
+    owner: AccountOwner,
+    charge: WizardStageCharges | null, 
 };
+
 export type State = {
     type: "PERSONALACCOUNT",
     clientid: number | null,
@@ -26,6 +27,7 @@ export type State = {
     accountname: string,
     search: string,
 };
+
 const validate = (state: State): boolean => {
     return (
         (state.clientsnotinlist)
@@ -34,9 +36,9 @@ const validate = (state: State): boolean => {
         );
 };
 
-export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, savedstate, onReady, onDirty, onNext }: Props) => {
+export const PersonalAccount: FC<Props & WizardCommonProps & WizardStateProps> = ({ subtype, balance, suspense, savedstate, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "PERSONALACCOUNT",
             clientid: null,
@@ -46,7 +48,7 @@ export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
             accountname: "",
             search: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
     const clicks = useRef(1);
 
@@ -62,7 +64,7 @@ export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
             }
             if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
-                onNext();
+                onNexty();
                 return;
             }
             setState(state => ({ ...state, accountid }));
@@ -97,7 +99,7 @@ export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (direction === 1? "Начисление: ": "Списание: ") + (subtype === "INTERNAL"? "Лицевые счета организации": "Лицевые счета клиентов") }
+                { (balance === "ACCRUAL"? "Начисление: ": "Списание: ") + (subtype === "INTERNAL"? "Лицевые счета организации": "Лицевые счета клиентов") }
             </div>
             <div className={styles.search}>
             <Input
@@ -123,7 +125,7 @@ export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
                 }
             </ul>
             {
-                regallowed?
+                suspense?
                     <div className={styles["clients-not-in-list"]}>
                         <input type="checkbox" checked={state.clientsnotinlist} onChange={onChangeClientsNotInList}></input>
                         <div>Клиент в списке отсутствует</div>
@@ -144,7 +146,7 @@ export const PersonalAccount: FC<Props> = ({ subtype, direction, regallowed, sav
                 }
             </ul>
             {
-                regallowed?
+                suspense?
                     <div className={styles["accounts-not-in-list"]}>
                         <input type="checkbox" checked={state.accountsnotinlist} onChange={onChangeAccountsNotInList}></input>
                         <div>Счёт в списке отсутствует</div>

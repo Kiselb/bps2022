@@ -3,19 +3,20 @@ import React, { FC, useState, useEffect, useRef } from 'react';
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
-import { mock } from './mock';
-import styles from './cofferaccount.module.css';
 import { Settings } from '../../../../../domain/settings/settings';
+import { WizardCommonProps, WizardStateProps, AccountOwner } from '../../../../../domain/transactions/types';
 
-type Props = {
-    direction: -1 | 1,
-    primary: boolean,
-    regallowed: boolean,
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
-    onNext: () => void,
+import styles from './cofferaccount.module.css';
+import { mock } from './mock';
+
+
+export type Props = {
+    subtype: "INTERNAL" | "EXTERNAL",
+    balance: "WITHDRAWAL" | "ACCRUAL",
+    position: "PRIMARY" | "SECONDARY",
+    suspense: boolean,
 };
+
 export type State = {
     type: "COFFERACCOUNT",
     accountid: number,
@@ -26,16 +27,16 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.accountid > 0));
 };
 
-export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, onReady, onDirty, onNext }) => {
+export const CofferAccount: FC<Props & WizardCommonProps & WizardStateProps> = ({ balance, suspense, savedstate, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "COFFERACCOUNT",
             accountid: 0,
             notinlist: false,
             search: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
     const clicks = useRef(1);
 
@@ -48,7 +49,7 @@ export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, on
             }
             if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
-                onNext();
+                onNexty();
                 return;
             }
             setState(state => ({ ...state, accountid }));
@@ -68,7 +69,7 @@ export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, on
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (direction === 1? "Приём: ": "Отправка: ") + "Ячейка организации"}
+                { (balance === "ACCRUAL"? "Приём: ": "Отправка: ") + "Ячейка организации"}
             </div>
             <div className={styles.search}>
                 <Input
@@ -94,7 +95,7 @@ export const CofferAccount: FC<Props> = ({ direction, regallowed, savedstate, on
                 }
             </ul>
             {
-                regallowed?
+                suspense?
                     <div className={styles["coffers-not-in-list"]}>
                         <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
                         <div>Ячейка в списке отсутствует</div>

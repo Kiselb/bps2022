@@ -1,6 +1,6 @@
 .page {
     display: grid;
-    grid-template-rows: auto auto auto auto auto 1fr;
+    grid-template-rows: auto auto auto auto auto auto 1fr;
     grid-template-columns: auto 1fr;
     row-gap: 0.25rem;   
     width: 100%;
@@ -37,24 +37,42 @@
     row-gap: 0.25rem;   
     font-family: 'Roboto';
 }
-.groups {
+.accounts-name {
     grid-row-start: 3;
     grid-row-end: 3;
     grid-column-start: 2;
     grid-column-end: 2;
 }
-.groups-label {
+.accounts-name-label {
     display: flex;
     align-items: center;
     grid-row-start: 3;
     grid-row-end: 3;
     grid-column-start: 1;
     grid-column-end: 1;
+    width: 100%;
+    margin-right: 0.5rem;
+    row-gap: 0.25rem;   
+    font-family: 'Roboto';
+}
+.groups {
+    grid-row-start: 4;
+    grid-row-end: 4;
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+.groups-label {
+    display: flex;
+    align-items: center;
+    grid-row-start: 4;
+    grid-row-end: 4;
+    grid-column-start: 1;
+    grid-column-end: 1;
     margin-right: 0.5rem;
 }
 .groups-not-in-list {
-    grid-row-start: 4;
-    grid-row-end: 4;
+    grid-row-start: 5;
+    grid-row-end: 5;
     grid-column-start: 2;
     grid-column-end: 2;
     display: flex;
@@ -74,8 +92,8 @@
     color: #777;
 }
 .groups-name {
-    grid-row-start: 5;
-    grid-row-end: 5;
+    grid-row-start: 6;
+    grid-row-end: 6;
     grid-column-start: 2;
     grid-column-end: 2;
 }

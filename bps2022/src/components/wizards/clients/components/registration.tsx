@@ -2,20 +2,19 @@ import React, { FC, useState, useEffect } from 'react';
 
 import { Input, Select } from 'antd';
 
-import styles from './registration.module.css';
+import { WizardCommonProps, WizardStateProps, AccountOwner, } from '../../../../domain/transactions/types';
 
+import styles from './registration.module.css';
 import { mock_groups } from '../mock';
 
-type Props = {
-    context: "SENDER" | "RECEIVER" | "NONE",
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
+export type Props = {
+    balance: "WITHDRAWAL" | "ACCRUAL" | "NONE",
 };
 
 export type State = {
     type: "REGPERSONALACCOUNT",
     name: string,
+    account: string,
     groups: string[],
     groupsnotinlist: boolean,
     groupname: string,
@@ -32,21 +31,25 @@ const validate = (state: State) => {
     );
 };
 
-export const Registration: FC<Props> = ({ context, savedstate, onReady, onDirty }) => {
+export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ balance, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(() => (
-        savedstate === null?
+        (savedstate as State | null) === null?
             {
                 type: "REGPERSONALACCOUNT",
                 name: "",
+                account: "Основной",
                 groups: [],
                 groupsnotinlist: false,
                 groupname: "",
             }
-            : { ...savedstate }
+            : { ...(savedstate as State) }
     ));
 
     const onChangeName = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, name: event.target.value }))
+    };
+    const onChangeAccount = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setState(state => ({ ...state, account: event.target.value }))
     };
     const onChangeGroups = (groups: string[]) => {
         setState(state => ({ ...state, groups}));
@@ -65,13 +68,25 @@ export const Registration: FC<Props> = ({ context, savedstate, onReady, onDirty 
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (context === "SENDER"? "Отправитель: ": (context === "RECEIVER"? "Получатель: ": "")) + "Регистрация клиента" }
+                { (balance === "WITHDRAWAL"? "Отправитель: ": (balance === "ACCRUAL"? "Получатель: ": "")) + "Регистрация клиента" }
             </div>
             <div className={styles["clients-name-label"]}>
                 <label>Имя клиента в системе:</label>
             </div>
             <div className={styles["clients-name"]}>
-                <Input style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }} onChange={onChangeName} defaultValue="" value={state.name}/>
+                <Input
+                    style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }}
+                    onChange={onChangeName}
+                    value={state.name}/>
+            </div>
+            <div className={styles["accounts-name-label"]}>
+                <label>Название счёта:</label>
+            </div>
+            <div className={styles["accounts-name"]}>
+                <Input
+                    style={{ width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" }}
+                    onChange={onChangeAccount}
+                    value={state.account}/>
             </div>
             <div className={styles["groups-label"]}>
                 <label>Группы клиента:</label>
@@ -85,6 +100,7 @@ export const Registration: FC<Props> = ({ context, savedstate, onReady, onDirty 
                     defaultValue={[]}
                     onChange={onChangeGroups}
                     options={mock_groups.map(item => ({ label: item.name, value: item.id }))}
+                    value={state.groups}
                 />                
             </div>
             <div className={styles["groups-not-in-list"]}>

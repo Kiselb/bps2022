@@ -1,21 +1,22 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import { TransactionTypesIdentity } from '../../../../../domain/automaton/automaton';
+import { WizardCommonProps, WizardStateProps, } from '../../../../../domain/transactions/types';
+import { TransactionTypesIdentity } from '../../../../../domain/transactions/automaton';
 
 import styles from './confirmation.module.css';
 
-type Props = {
+export type Props = {
     transaction: TransactionTypesIdentity | null,
     autocomplete: boolean,
-    onReady: (state: State, registration: boolean) => void,
 };
+
 export type State = {
     type: "CONFIRMATION",
     confirmed: boolean,
     autocomplete: boolean,
 };
 
-export const Confirmation: FC<Props> = ({ autocomplete, onReady }) => {
+export const Confirmation: FC<Props & WizardCommonProps & WizardStateProps> = ({ autocomplete, onReady }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>({
         type: "CONFIRMATION",
         confirmed: false,

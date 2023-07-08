@@ -3,18 +3,17 @@ import React, { FC, useState, useEffect, useRef } from 'react';
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
+import { Settings } from '../../../../../domain/settings/settings';
+import { WizardCommonProps, WizardStateProps, } from '../../../../../domain/transactions/types';
+
 import styles from './article.module.css';
 import { mock } from './mock';
-import { Settings } from '../../../../../domain/settings/settings';
 
-type Props = {
+export type Props = {
     subtype: "INCOME" | "EXPENSES",
-    savedstate: State | null,
-    regallowed: boolean,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
-    onNext: () => void,
+    suspense: boolean,
 };
+
 export type State = {
     type: "ARTICLE",
     articleid: number,
@@ -29,16 +28,16 @@ const validate = (state: State) => {
     );
 };
 
-export const Article: FC<Props> = ({ subtype, savedstate, regallowed, onReady, onDirty, onNext }: Props) => {
+export const Article: FC<Props & WizardCommonProps & WizardStateProps> = ({ subtype, savedstate, suspense, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "ARTICLE",
             articleid: -1,
             notinlist: false,
             search: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
     const clicks = useRef(1);
 
@@ -51,7 +50,7 @@ export const Article: FC<Props> = ({ subtype, savedstate, regallowed, onReady, o
             }
             if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
-                onNext();
+                onNexty();
                 return;
             }
             setState(state => ({ ...state, articleid }));
@@ -98,7 +97,7 @@ export const Article: FC<Props> = ({ subtype, savedstate, regallowed, onReady, o
                 }
             </ul>
             {
-                regallowed?
+                suspense?
                     <div className={styles["articles-not-in-list"]}>
                         <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
                         <div>Статья в списке отсутствует</div>

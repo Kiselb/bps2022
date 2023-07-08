@@ -1,14 +1,14 @@
 import React, { FC, useState, useEffect } from 'react';
 
+import { WizardCommonProps, WizardStateProps, AccountOwner, } from '../../../../../domain/transactions/types';
+
 import styles from './registration.module.css';
 
-export type State = {
-    accountname: string
-};
+export type Props = Record<string, unknown>;
 
-type Props = {
-    onReady: (state: State) => void,
-    onDirty: (state: State) => void,
+export type State = {
+    type: "REGCASHACOUNT",
+    accountname: string,
 };
 
 const validate = (state: State) => {
@@ -18,13 +18,14 @@ const validate = (state: State) => {
     );
 };
 
-export const Registration: FC<Props> = ({ onReady, onDirty }) => {
+export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>({
+        type: "REGCASHACOUNT",
         accountname: "",
     });
 
     useEffect(() => {
-        validate(state)? onReady({ ...state }): onDirty({ ...state });
+        validate(state)? onReady({ ...state }, false): onDirty({ ...state });
     }, [state]);
 
     return (

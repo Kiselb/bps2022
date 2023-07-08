@@ -2,19 +2,20 @@ import React, { FC, useState, useEffect, CSSProperties } from 'react';
 
 import { Input, Select } from 'antd';
 
+import { AccountOwner, WizardCommonProps, WizardStateProps, } from '../../../../../domain/transactions/types';
+
 import { mock as currencymock } from '../../../transaction/components/sums/mock';
 import { mock as organizationsmock } from '../../../organization/mock';
 
 import styles from './registration.module.css';
 
 export type Props = {
-    context: "SENDER" | "RECEIVER" | "NONE",
+    balance: "WITHDRAWAL" | "ACCRUAL" | "NONE",
     subtype: "INTERNAL" | "EXTERNAL",
-    client: boolean,
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
+    owner: AccountOwner,
+    suspense: boolean,
 };
+
 export type State = {
     type: "REGBANKACCOUNT",
     primaryno: string,
@@ -29,7 +30,7 @@ export type State = {
     search: string,
 };
 
-const validate = (state: State, client: boolean) => {
+const validate = (state: State, client: AccountOwner) => {
     return (
         true
         && state.primaryno.length > 0
@@ -45,9 +46,9 @@ const validate = (state: State, client: boolean) => {
     );
 };
 
-export const Registration: FC<Props> = ({ context, subtype, client, savedstate, onReady, onDirty }) => {
+export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ balance, subtype, owner, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as (State | null)) === null?
         {
             type: "REGBANKACCOUNT",
             primaryno: "",
@@ -61,7 +62,7 @@ export const Registration: FC<Props> = ({ context, subtype, client, savedstate, 
             notinlist: false,
             search: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
     const onPrimaryNo = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, primaryno: event.target.value }));
@@ -85,14 +86,14 @@ export const Registration: FC<Props> = ({ context, subtype, client, savedstate, 
         setState(state => ({ ...state, notinlist: event.target.checked }));
     };
     const onOrganization = (organizationid: number, clientid: number | null) => {
-        setState(state => ({ ...state, organizationid, clientid: client? clientid: null }));
+        setState(state => ({ ...state, organizationid, clientid: owner? clientid: null }));
     };
     const onSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setState(state => ({ ...state, search: event.target.value }));
     };
 
     useEffect(() => {
-        validate(state, client)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
+        validate(state, owner)? onReady({ ...state }, state.notinlist): onDirty({ ...state });
     }, [state]);
 
     const styleinput: CSSProperties = { width: '100%', fontFamily: "'Roboto'", fontSize: "1rem", height: "2.25rem", textAlign: "left" };
@@ -100,7 +101,7 @@ export const Registration: FC<Props> = ({ context, subtype, client, savedstate, 
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (context === "SENDER"? "Отправитель: ": (context === "RECEIVER"? "Получатель: ": "")) + (subtype === "INTERNAL"? "Регистрация расчётного счёта организации": "Регистрация расчётного счёта внешнего")}
+                { (balance === "WITHDRAWAL"? "Отправитель: ": (balance === "ACCRUAL"? "Получатель: ": "")) + (subtype === "INTERNAL"? "Регистрация расчётного счёта организации": "Регистрация расчётного счёта внешнего")}
             </div>
             <div className={styles["primaryno-label"]}>
                 <label>Расчётный счёт:</label>

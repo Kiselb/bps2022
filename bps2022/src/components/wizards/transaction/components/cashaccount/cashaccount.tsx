@@ -3,20 +3,19 @@ import React, { FC, useState, useEffect, useRef } from 'react';
 import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
+import { Settings } from '../../../../../domain/settings/settings';
+import { WizardCommonProps, WizardStateProps, AccountOwner } from '../../../../../domain/transactions/types';
+
 import styles from './cashaccount.module.css';
 import { mock } from './mock';
-import { Settings } from '../../../../../domain/settings/settings';
 
-type Props = {
+export type Props = {
     subtype: "INTERNAL" | "EXTERNAL",
-    direction: -1 | 1,
-    primary: boolean,
-    regallowed: boolean,
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
-    onNext: () => void,
+    balance: "WITHDRAWAL" | "ACCRUAL" | "NONE",
+    position: "PRIMARY" | "SECONDARY" | "NONE",
+    suspense: boolean,
 };
+
 export type State = {
     type: "CASHACCOUNT",
     accountid: number,
@@ -27,16 +26,16 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist &&  state.accountid > 0));
 };
 
-export const CashAccount: FC<Props> = ({ subtype, direction, savedstate, regallowed, onReady, onDirty, onNext }: Props) => {
+export const CashAccount: FC<Props & WizardCommonProps & WizardStateProps> = ({ subtype, balance, savedstate, suspense, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "CASHACCOUNT",
             accountid: 0,
             notinlist: false,
             search: "",
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
     const clicks = useRef(1);
 
@@ -49,7 +48,7 @@ export const CashAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
             }
             if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
-                onNext();
+                onNexty();
                 return;
             }
             setState(state => ({ ...state, accountid }));
@@ -69,7 +68,7 @@ export const CashAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { (direction === 1? "Приём: ": "Отправка: ") + (subtype === "INTERNAL"? "Кассовые счета организации": "Кассовые счета внешние") }
+                { (balance === "ACCRUAL"? "Приём: ": "Отправка: ") + (subtype === "INTERNAL"? "Кассовые счета организации": "Кассовые счета внешние") }
             </div>
             <div className={styles.search}>
                 <Input
@@ -95,7 +94,7 @@ export const CashAccount: FC<Props> = ({ subtype, direction, savedstate, regallo
                 }
             </ul>
             {
-                regallowed?
+                suspense?
                     <div className={styles["accounts-not-in-list"]}>
                         <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
                         <div>Счёт в списке отсутствует</div>

@@ -1,19 +1,18 @@
 import React, { FC, useState, useEffect, useRef } from 'react';
 
-import { mock } from './mock';
-import styles from './lendingaccount.module.css';
 import { Settings } from '../../../../../domain/settings/settings';
+import { WizardCommonProps, WizardStateProps, AccountOwner } from '../../../../../domain/transactions/types';
+
+import styles from './lendingaccount.module.css';
+import { mock } from './mock';
 
 export type Props = {
-    clientid: number | null,
-    direction: -1 | 1,
-    primary: boolean,
-    regallowed: boolean,
-    savedstate: State | null,
-    onReady: (state: State, registration: boolean) => void,
-    onDirty: (state: State) => void,
-    onNext: () => void,
+    balance: "WITHDRAWAL" | "ACCRUAL",
+    position: "PRIMARY" | "SECONDARY",
+    suspense: boolean,
+    owner: AccountOwner
 };
+
 export type State = {
     type: "LENDINGACCOUNT",
     accountid: number,
@@ -24,15 +23,16 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.accountid > 0));
 };
 
-export const LendingAccount: FC<Props> = ({ clientid, direction, regallowed, savedstate, onReady, onDirty, onNext }) => {
+export const LendingAccount: FC<Props & WizardCommonProps & WizardStateProps> = ({ owner, balance, suspense, savedstate, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
+    const clientid: number | null = null;
     const [state, setState] = useState<State>(
-        savedstate === null?
+        (savedstate as State | null) === null?
         {
             type: "LENDINGACCOUNT",
             accountid: -1,
             notinlist: (clientid === null || clientid <= 0)? true: false,
         }
-        : { ...savedstate }
+        : { ...(savedstate as State) }
     );
     const clicks = useRef(1);
 
@@ -45,7 +45,7 @@ export const LendingAccount: FC<Props> = ({ clientid, direction, regallowed, sav
             }
             if (clicks.current > Settings.clicksOnNext) {
                 clicks.current = 1;
-                onNext();
+                onNexty();
                 return;
             }
             setState(state => ({ ...state, accountid }));
@@ -64,7 +64,7 @@ export const LendingAccount: FC<Props> = ({ clientid, direction, regallowed, sav
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                { "Ссудный счёт: " + (direction === 1? "Погашение": "Выдача") }
+                { "Ссудный счёт: " + (balance === "ACCRUAL"? "Погашение": "Выдача") }
             </div>
             <ul className={styles["accounts-list"]}>
                 {
@@ -80,7 +80,7 @@ export const LendingAccount: FC<Props> = ({ clientid, direction, regallowed, sav
                 }
             </ul>
             {
-                regallowed?
+                suspense?
                     <div className={styles["accounts-not-in-list"]}>
                         <input type="checkbox" checked={state.notinlist} onChange={onChangeInList}></input>
                         <div>Счёт в списке отсутствует</div>

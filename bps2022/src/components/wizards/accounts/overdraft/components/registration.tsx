@@ -5,7 +5,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 
 import { isDecimal } from '../../../../../domain/utilities';
-import { WizardCommonProps, WizardStateProps, AccountOwner, } from '../../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, AccountOwner, } from '../../../../../domain/transactions/types';
 
 import styles from './registration.module.css';
 import { mock } from '../../../transaction/components/bankaccount/mock';
@@ -29,7 +29,7 @@ const validate = (state: State) => {
     );
 };
 
-export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const Registration: FC<Props & WizardControlProps & WizardContextProps> = ({ savedstate, onReady, onDirty }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setState] = useState<State>(
         (savedstate as State | null) === null?
         {

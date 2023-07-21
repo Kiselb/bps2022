@@ -10,7 +10,7 @@ import { round } from '../../../../../domain/utilities';
 import { Decimal } from '../../../../decimal/decimal';
 
 import { Settings } from '../../../../../domain/settings/settings';
-import { WizardCommonProps, WizardStateProps, } from '../../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, } from '../../../../../domain/transactions/types';
 
 import styles from './sums.module.css';
 import { mock } from './mock';
@@ -35,7 +35,7 @@ const validate = (state: State): boolean => {
     );
 };
 
-export const Sums: FC<Props & WizardCommonProps & WizardStateProps> = ({ exchange, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const Sums: FC<Props & WizardControlProps & WizardContextProps> = ({ exchange, savedstate, onReady, onDirty }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setState] = useState<State>(
         (savedstate as State | null) === null?
         {

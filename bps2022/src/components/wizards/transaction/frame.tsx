@@ -1,9 +1,9 @@
 import React, { FC, useState, useRef, useEffect, Component } from "react";
 import { QuestionOutlined, LeftOutlined, RightOutlined, CheckOutlined, UndoOutlined } from '@ant-design/icons';
 
-import { WizardStageStates, WizardStageProps, TransactionComponentDependency } from '../../../domain/transactions/types';
-import { TransactionTypesIdentity, TransactionGroupSelector, WizardPagesTypesUnion, automaton, isRegularPage } from '../../../domain/transactions/automaton';
-
+import { TransactionTypesIdentity, WizardStageStates, } from '../../../domain/transactions/types';
+import { TransactionGroupSelector, WizardPagesTypesUnion, WizardPagesPropsUnion, } from '../../../domain/transactions/types';
+import { automaton } from "../../../domain/transactions/automaton";
 import { Selector } from './components/selector/selector';
 import { Narrowing } from './components/narrowing/narrowing';
 import { Roadmap } from './components/roadmap/roadmap';
@@ -98,10 +98,11 @@ export const Frame: FC = () => {
             }
         }
     );
-    const getParams = (param: string): string | number | boolean | null => {
-        return state.params[param]; // Добавить проверку на наличие свойства
+    const getParam = (param: string): string | number | boolean | null => {
+        if (state.params[param] === undefined) return null;
+        return state.params[param];
     };
-    const setParams = (param: string, value: string | number | boolean | null): string | number | boolean | null => {
+    const setParam = (param: string, value: string | number | boolean | null): string | number | boolean | null => {
         state.params[param] = value;
         return state.params[param];
     };
@@ -146,7 +147,7 @@ export const Frame: FC = () => {
             return ({...state, step, clicks: currentclicks > Settings.clicksOnNext? 1: currentclicks, transactionid, wizardpages: [...automaton.filter(item => item[0] === transactionid)[0][3] || []] });
         });
     };
-    const stepNext = () => {
+    const stepNextOld = () => {
         if (state.step < state.wizardpages.length - 1) {
             if (state.step === -2) {
                 (state.selection.origin !== null && state.selection.target !== null) && setState(state => ({...state, step: -1 }));
@@ -158,9 +159,35 @@ export const Frame: FC = () => {
                         setState(state => ({...state, step: state.step + 1 }));
                     } else {
                         for(let i = state.step + 1; i < state.wizardpages.length; i++) {
-                            if (isRegularPage(state.wizardpages[i])) {
-                                setState(state => ({...state, step: i }));
+                            // if (isRegularPage(state.wizardpages[i])) {
+                            //     setState(state => ({...state, step: i }));
+                            //     break;
+                            // }
+                        }
+                    }
+                    state.validated = false;
+                }
+            }
+        }
+    };
+    const stepNext = () => {
+        if (state.step < state.wizardpages.length - 1) {
+            if (state.step === -2) {
+                (state.selection.origin !== null && state.selection.target !== null) && setState(state => ({...state, step: -1 }));
+            } else if (state.step === -1) {
+                (state.transactionid !== null) && setState(state => ({...state, step: 0 }));
+            } else {
+                if (state.validated) {
+                    if (state.nextisregistration) {
+                        setState(state => ({...state, step: state.step + 1 }));
+                    } else {
+                        let previousissuspend = false;
+                        for(let i = state.step + 1; i < state.wizardpages.length; i++) {
+                            if (state.wizardpages[i].props["suspense" as keyof WizardPagesPropsUnion] === undefined && previousissuspend) {
+                                setState(state => ({ ...state, step: i + 1 }));
                                 break;
+                            } else {
+                                previousissuspend = (state.wizardpages[i].props["suspense" as keyof WizardPagesPropsUnion] !== undefined);
                             }
                         }
                     }
@@ -242,31 +269,6 @@ export const Frame: FC = () => {
 
     const getSavedState = (identity: string): WizardStageStates | null => state.statesmap.get(identity) || null;
 
-    const getDynamicProps = (states: Map<string, WizardStageStates>, history: string[], sources: TransactionComponentDependency[]): { [key: string]: string | number | boolean | null } => {
-        const result: { [key: string]: string | number | boolean | null } = {};
-        
-        for(let i = 0; i < sources.length; i++) {
-            nextsource: for(let j = 0; j < sources[i].path.length; j++) {
-                for(let k = 0; k < history.length; k++) {
-                    if (sources[i].path[j].identity === history[k]) {
-                        const identity = sources[i].path[j].identity;
-                        const propsource: keyof WizardStageStates = sources[i].path[j].source as (keyof WizardStageStates); // refactoring required
-                        const propdestination = sources[i].destination;
-                        const statesaved = states.get(identity);
-
-                        if (statesaved) {
-                            result[propdestination] = statesaved[propsource];
-                        } else {
-                            result[propdestination] = null;
-                        }
-                        break nextsource;
-                    }
-                }
-            }
-        }
-        return result;
-    };
-
     const CurrentPageV2: FC = () => {
         //const component = { element: Selector };
         return (
@@ -299,9 +301,9 @@ export const Frame: FC = () => {
             );
         } else {
             const page = state.wizardpages[state.step];
-            const Component = (page.component as unknown) as React.FC<WizardStageProps>;
+            const Component = (page.component as unknown) as React.FC<WizardPagesPropsUnion>;
             const savedstate = getSavedState(state.wizardpages[state.step].identity) as WizardStageStates;
-            const props = ({ ...page.props, savedstate, onReady, onDirty, onNexty } as WizardStageProps);
+            const props = ({ ...page.props, savedstate, onReady, onDirty, onNexty, getParam, setParam });
             return (
                 <Component  { ...props }/>
             );

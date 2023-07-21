@@ -4,169 +4,12 @@
 // Typescript React: Access component property types: https://stackoverflow.com/questions/43230765/typescript-react-access-component-property-types
 // Is it possible to build custom intrinsic type?: https://stackoverflow.com/questions/68937638/is-it-possible-to-build-custom-intrinsic-type
 
-import { FC } from 'react';
-
-import { Props as BankAccountProps, BankAccount } from '../../components/wizards/transaction/components/bankaccount/bankaccount';
-import { Props as CashAccountProps, CashAccount } from '../../components/wizards/transaction/components/cashaccount/cashaccount';
-import { Props as PersonalAccountProps, PersonalAccount } from '../../components/wizards/transaction/components/personalaccount/personalaccount';
-import { Props as ExternalAccountProps, ExternalAccount } from '../../components/wizards/transaction/components/externalaccount/externalaccount';
-import { Props as LendingAccountProps, LendingAccount } from '../../components/wizards/transaction/components/lendingaccount/lendingaccount';
-import { Props as CofferAccountProps, CofferAccount } from '../../components/wizards/transaction/components/cofferaccount/cofferaccount';
-import { Props as OverdraftProps, Overdraft } from '../../components/wizards/transaction/components/overdraft/overdraft';
-import { Props as SumProps, Sums } from '../../components/wizards/transaction/components/sums/sums';
-import { Props as ConfirmationProps, Confirmation } from '../../components/wizards/transaction/components/confirmation/confirmation';
-import { Props as ArticleProps, Article } from '../../components/wizards/transaction/components/article/article';
-import { Props as ServiceChargeProps, ServiceCharge } from '../../components/wizards/transaction/components/servicecharge/servicecharge';
-
-import { Props as BankAccountRegistrationProps, Registration as BankAccountRegistration } from '../../components/wizards/accounts/bankaccount/components/registration';
-import { Props as OrganizationRegistrationProps, Registration as OrganizationRegistration } from '../../components/wizards/organization/components/registration';
-import { Props as CashAccountRegistrationProps, Registration as CashAccountRegistration } from '../../components/wizards/accounts/cashaccount/components/registration';
-import { Props as PersonalAccountRegistrationProps, Registration as PersonalAccountRegistration } from '../../components/wizards/clients/components/registration';
-import { Props as ExternalAccountRegistrationProps, Registration as ExternalAccountRegistration } from '../../components/wizards/accounts/externalaccount/components/registration';
-import { Props as CofferAccountRegistrationProps, Registration as CofferAccountRegistration } from '../../components/wizards/accounts/cofferaccount/components/registration';
-import { Props as LendingAccountRegistrationProps, Registration as LendingAccountRegistration } from '../../components/wizards/accounts/lendingaccount/components/registration';
-import { Props as OverdraftRegistrationProps, Registration as OverdraftRegistration } from '../../components/wizards/accounts/overdraft/components/registration';
-import { Props as ArticleRegistrationProps, Registration as ArticleRegistration } from '../../components/wizards/article/registration';
-
-import { AccountOwner, WizardStageCharges, WizardCommonProps, WizardStateProps } from './types';
-
-export type TransactionTypesIdentity =
-    "01-010" | "01-020" | "01-030" | "01-040" | "01-050" | "01-060" | "01-070" |
-    "02-010" | "02-020" | "02-030" | "02-040" | "02-050" |
-    "03-010" | "03-020" | "03-030" | "03-040" | "03-050" |
-    "04-010" | "04-020" | "04-030" |
-    "05-010" |
-    "06-010" | "06-020" |
-    "07-010" | "07-020" |
-    "08-010" |
-    "09-010" | "09-011" |
-
-    "10-010" |
-    "11-010" | "11-020" | "11-030" |
-    "12-010" | "12-020" |
-    "13-010" | "13-020" |
-    "14-010" | "14-011" |
-
-    "15-010" | "15-020" |
-    "16-010" | "16-020" |
-    "17-010" | "17-011" | "17-020" | "17-030" | "17-040" | "17-050" |
-    "18-010" | "18-020" |
-
-    "19-010" | "19-020" | "19-030" |
-    "20-010" |
-    "21-010" | "21-020" |
-    "22-010" | "22-020" |
-    "23-010" | "23-020" | "23-030" | "23-040" | "23-050" |
-
-    "24-010" |
-    "25-010" | "25-011" |
-    "26-010" | "26-011" |
-    "27-010" | "27-011" |
-
-    "28-010" | "28-020" | "28-030" | "28-040" | "28-050" |
-
-    "29-010" | "29-020" | "29-030" | "29-040" | "29-050";
-
-export type TransactionGroupSelector = "BANKACCOUNTEXTERNAL" | "BANKACCOUNTINTERNAL" | "CASHACCOUNT" | "PERSONALACCOUNT" | "EXTERNALACCOUNT" | "COFFERACCOUNT" | "INCOME" | "EXPENSE";
-
-export type WizardPagesTypes_SUMEXCHANGE = { type: "SUMEXCHANGE", props: SumProps, identity: string, marker: string, component: FC<SumProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_BANKACCOUNT = { type: "BANKACCOUNT", props: BankAccountProps, identity: string, marker: string, component: FC<BankAccountProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_CASHACCOUNT = { type: "CASHACCOUNT", props: CashAccountProps, identity: string, marker: string, component: FC<CashAccountProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_PERSONALACCOUNT = { type: "PERSONALACCOUNT", props: PersonalAccountProps, identity: string, marker: string, component: FC<PersonalAccountProps & WizardCommonProps & WizardStateProps> };
-export type WizardPagesTypes_LENDINGACCOUNT = { type: "LENDINGACCOUNT", props: LendingAccountProps, identity: string, marker: string, component: FC<LendingAccountProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_EXTERNALACCOUNT = { type: "EXTERNALACCOUNT", props: ExternalAccountProps, identity: string, marker: string, component: FC<ExternalAccountProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_COFFERACCOUNT = { type: "COFFERACCOUNT", props: CofferAccountProps, identity: string, marker: string, component: FC<CofferAccountProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_OVERDRAFT = { type: "OVERDRAFT", props: OverdraftProps, identity: string, marker: string, component: FC<OverdraftProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_ARTICLE = { type: "ARTICLE", props: ArticleProps, identity: string, marker: string, component: FC<ArticleProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_SERVICECHARGE = { type: "SERVICECHARGE", props: ServiceChargeProps, identity: string, marker: string, component: FC<ServiceChargeProps & WizardCommonProps & WizardStateProps> };
-export type WizardPagesTypes_CONFIRMATION = { type: "CONFIRMATION", props: ConfirmationProps, identity: string, marker: string, component: FC<ConfirmationProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_REGBANKACCOUNT = { type: "REGBANKACCOUNT", props: BankAccountRegistrationProps, identity: string, marker: string, component: FC<BankAccountRegistrationProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_REGORGANIZATION = { type: "REGORGANIZATION", props: OrganizationRegistrationProps, identity: string, marker: string, component: FC<OrganizationRegistrationProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_REGCASHACCOUNT = { type: "REGCASHACCOUNT", props: CashAccountRegistrationProps, identity: string, marker: string, component: FC<CashAccountRegistrationProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_REGPERSONALACCOUNT = { type: "REGPERSONALACCOUNT", props: PersonalAccountRegistrationProps, identity: string, marker: string, component: FC<PersonalAccountRegistrationProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_REGLENDINGACCOUNT = { type: "REGLENDINGACCOUNT", props: LendingAccountRegistrationProps, identity: string, marker: string, component: FC<LendingAccountRegistrationProps & WizardCommonProps & WizardStateProps>};
-export type WizardPagesTypes_REGEXTERNALACCOUNT = { type: "REGEXTERNALACCOUNT", props: ExternalAccountRegistrationProps, identity: string, marker: string, component: FC<ExternalAccountRegistrationProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_REGCOFFERACCOUNT = { type: "REGCOFFERACCOUNT", props: CofferAccountRegistrationProps, identity: string, marker: string, component: FC<CofferAccountRegistrationProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_REGOVERDRAFT = { type: "REGOVERDRAFT", props: OverdraftRegistrationProps, identity: string, marker: string, component: FC<OverdraftRegistrationProps & WizardCommonProps & WizardStateProps>, };
-export type WizardPagesTypes_REGARTICLE = { type: "REGARTICLE", props: ArticleRegistrationProps, identity: string, marker: string, component: FC<ArticleRegistrationProps & WizardCommonProps & WizardStateProps>, };
-
-export type WizardPagesRegularTypes =
-    WizardPagesTypes_SUMEXCHANGE
-    | WizardPagesTypes_BANKACCOUNT
-    | WizardPagesTypes_CASHACCOUNT
-    | WizardPagesTypes_PERSONALACCOUNT
-    | WizardPagesTypes_LENDINGACCOUNT
-    | WizardPagesTypes_EXTERNALACCOUNT
-    | WizardPagesTypes_COFFERACCOUNT
-    | WizardPagesTypes_OVERDRAFT
-    | WizardPagesTypes_ARTICLE
-    | WizardPagesTypes_SERVICECHARGE
-    | WizardPagesTypes_CONFIRMATION
-    ;
-
-export type WizardPagesRegisterTypes =
-    WizardPagesTypes_REGBANKACCOUNT
-    | WizardPagesTypes_REGORGANIZATION
-    | WizardPagesTypes_REGCASHACCOUNT
-    | WizardPagesTypes_REGPERSONALACCOUNT
-    | WizardPagesTypes_REGLENDINGACCOUNT
-    | WizardPagesTypes_REGEXTERNALACCOUNT
-    | WizardPagesTypes_REGCOFFERACCOUNT
-    | WizardPagesTypes_REGOVERDRAFT
-    | WizardPagesTypes_REGARTICLE
-    ;
-
-type TestUnion = keyof WizardPagesTypesUnion;
-export type WizardPagesTypesUnion = WizardPagesRegularTypes | WizardPagesRegisterTypes;
-
-export function isRegularPage(page: WizardPagesTypesUnion): page is WizardPagesRegularTypes {
-    switch(page.type) {
-        case "SUMEXCHANGE":
-        case "BANKACCOUNT":
-        case "CASHACCOUNT":
-        case "PERSONALACCOUNT":
-        case "LENDINGACCOUNT":
-        case "EXTERNALACCOUNT":
-        case "COFFERACCOUNT":
-        case "OVERDRAFT":
-        case "SERVICECHARGE":
-        case "ARTICLE":
-        case "CONFIRMATION":
-            return true;
-        default:
-            return false;
-    }
-}
-export function isRegisterPage(page: WizardPagesTypesUnion): page is WizardPagesRegisterTypes {
-    switch(page.type) {
-        case "REGBANKACCOUNT":
-        case "REGORGANIZATION":
-        case "REGCASHACCOUNT":
-        case "REGPERSONALACCOUNT":
-        case "REGEXTERNALACCOUNT":
-        case "REGCOFFERACCOUNT":
-        case "REGLENDINGACCOUNT":
-        case "REGOVERDRAFT":
-        case "REGARTICLE":
-            return true;
-        default:
-            return false;
-    }
-}
-
-// Строка автомата определения типа транзакции (TR_Automaton_Map_V2)
-export type TransactionType = Readonly<[
-
-    
-    TransactionTypesIdentity,                               // Уникальный идентификатор типа транзакции
-    TransactionTypesIdentity | null,                        // Уникальный идентификатор основного типа транзакции
-    [TransactionGroupSelector, TransactionGroupSelector],   // Селектор группы транзакций по комбинациям типов счетов
-    WizardPagesTypesUnion[] | null,                         // Группы параметров
-    boolean,                                                // Автоматическое выполнение разрешено
-    string,                                                 // Описание типа транзакции для пользователя
-]>;
-
-export const isChargedPage = <U extends { charge: string }>(page: WizardPagesTypesUnion | U): page is U => ("charge" in page);
+import {
+    TransactionType,
+    BankAccount, CashAccount, PersonalAccount, ExternalAccount, LendingAccount, CofferAccount, Overdraft, Sums, Confirmation, Article, ServiceCharge,
+    BankAccountRegistration, OrganizationRegistration, CashAccountRegistration, PersonalAccountRegistration, OverdraftRegistration, ArticleRegistration,
+    ExternalAccountRegistration, CofferAccountRegistration, LendingAccountRegistration
+} from './types';
 
 export const automaton: Readonly<TransactionType[]> = [
     
@@ -217,15 +60,15 @@ export const automaton: Readonly<TransactionType[]> = [
         { type: "REGBANKACCOUNT", props: { subtype: "EXTERNAL", balance: "WITHDRAWAL", suspense: true, owner: "REQUIREDANY", }, identity: "TYPE:REGBANKACCOUNT;DIRECTION:-1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", component: BankAccountRegistration, },
         { type: "REGORGANIZATION", props: { subtype: "EXTERNAL", balance: "WITHDRAWAL", owner: "REQUIREDANY", }, identity: "TYPE:REGORGANIZATION;DIRECTION:-1;SUBTYPE:EXTERNAL", marker: "?", component: OrganizationRegistration, },
 
-        { type: "BANKACCOUNT", props: { position: "PRIMARY", subtype: "EXTERNAL", balance: "ACCRUAL", suspense: true, owner: "REQUIREDNOTSAME", }, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", component: BankAccount, },
-        { type: "REGBANKACCOUNT", props: { subtype: "EXTERNAL", balance: "ACCRUAL", suspense: true, owner: "REQUIREDNOTSAME", }, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", component: BankAccountRegistration, },
-        { type: "REGORGANIZATION", props: { subtype: "EXTERNAL", balance: "ACCRUAL", owner: "REQUIREDNOTSAME", }, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", component: OrganizationRegistration, },
+        { type: "BANKACCOUNT", props: { position: "PRIMARY", subtype: "EXTERNAL", balance: "ACCRUAL", suspense: true, owner: "ORIGINNOTSAME", }, identity: "TYPE:BANKACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "РС", component: BankAccount, },
+        { type: "REGBANKACCOUNT", props: { subtype: "EXTERNAL", balance: "ACCRUAL", suspense: true, owner: "ORIGINNOTSAME", }, identity: "TYPE:REGBANKACCOUNT;DIRECTION:1;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "?", component: BankAccountRegistration, },
+        { type: "REGORGANIZATION", props: { subtype: "EXTERNAL", balance: "ACCRUAL", owner: "ORIGINNOTSAME", }, identity: "TYPE:REGORGANIZATION;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", component: OrganizationRegistration, },
 
-        { type: "EXTERNALACCOUNT", props: { position: "SECONDARY", subtype: "INTERNAL", balance: "WITHDRAWAL", suspense: false, owner: "NOTREQUIRED", charge: "ENTERPRISEEXTERNALOUTCOME", }, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", marker: "ВС", component: ExternalAccount, },
-        { type: "EXTERNALACCOUNT", props: { position: "SECONDARY", subtype: "INTERNAL", balance: "ACCRUAL", suspense: true, owner: "NOTREQUIRED", charge: "ENTERPRISEEXTERNALINCOME", }, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "ВС", component: ExternalAccount, },
+        { type: "EXTERNALACCOUNT", props: { position: "SECONDARY", subtype: "INTERNAL", balance: "WITHDRAWAL", suspense: false, owner: "ORIGINSAME", charge: "ENTERPRISEEXTERNALOUTCOME", }, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:-1;PRIMARY:FALSE;REGISTRATION:FALSE;SUBTYPE:INTERNAL", marker: "ВС", component: ExternalAccount, },
+        { type: "EXTERNALACCOUNT", props: { position: "SECONDARY", subtype: "INTERNAL", balance: "ACCRUAL", suspense: true, owner: "TARGETSAME", charge: "ENTERPRISEEXTERNALINCOME", }, identity: "TYPE:EXTERNALACCOUNT;DIRECTION:1;PRIMARY:FALSE;REGISTRATION:TRUE;SUBTYPE:INTERNAL", marker: "ВС", component: ExternalAccount, },
         { type: "REGEXTERNALACCOUNT", props: { subtype: "INTERNAL", balance: "ACCRUAL", }, identity: "TYPE:REGEXTERNALACCOUNT;DIRECTION:1;SUBTYPE:INTERNAL", marker: "?", component: ExternalAccountRegistration, },
 
-        { type: "SERVICECHARGE", props: { charges: ["ENTERPRISEEXTERNALOUTCOME", "ENTERPRISEEXTERNALINCOME"], }, identity: "TYPE:SERVICECHARGE", marker: "%%", component: ServiceCharge, },
+        { type: "SERVICECHARGE", props: { }, identity: "TYPE:SERVICECHARGE", marker: "%%", component: ServiceCharge, },
         { type: "CONFIRMATION", props: { transaction: null, autocomplete: false, }, identity: "TYPE:CONFIRMATION", marker: "ПТ", component: Confirmation, },
     ], true, "Перемещение между внешними счетами различных развивающих"],
     ["01-050", null, ["BANKACCOUNTEXTERNAL", "BANKACCOUNTEXTERNAL"], [
@@ -571,7 +414,7 @@ export const automaton: Readonly<TransactionType[]> = [
     ["17-010", null, ["PERSONALACCOUNT", "PERSONALACCOUNT"], [
         { type: "SUMEXCHANGE", props: { exchange: true, }, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", component: Sums, },
         { type: "PERSONALACCOUNT", props: { position: "PRIMARY", subtype: "EXTERNAL", balance: "WITHDRAWAL", suspense: false, owner: "REQUIREDANY", charge: "CLIENTPERSONALOUTCOMENETTING", }, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", marker: "КЛ", component: PersonalAccount, },
-        { type: "PERSONALACCOUNT", props: { position: "PRIMARY", subtype: "EXTERNAL", balance: "ACCRUAL", suspense: true, owner: "REQUIREDNOTSAME", charge: "CLIENTPERSONALINCOMENETTING", }, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "КЛ", component: PersonalAccount, },
+        { type: "PERSONALACCOUNT", props: { position: "PRIMARY", subtype: "EXTERNAL", balance: "ACCRUAL", suspense: true, owner: "ORIGINNOTSAME", charge: "CLIENTPERSONALINCOMENETTING", }, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "КЛ", component: PersonalAccount, },
         { type: "REGPERSONALACCOUNT", props: { balance: "ACCRUAL", }, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", component: PersonalAccountRegistration, },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", props: { charges: ["CLIENTPERSONALOUTCOMENETTING", "CLIENTPERSONALINCOMENETTING"], }, marker: "%%", component: ServiceCharge, },
@@ -580,7 +423,7 @@ export const automaton: Readonly<TransactionType[]> = [
     ["17-011", null, ["PERSONALACCOUNT", "PERSONALACCOUNT"], [
         { type: "SUMEXCHANGE", props: { exchange: true, }, identity: "TYPE:SUMEXCHANGE;EXCHANGE:TRUE", marker: "СК", component: Sums, },
         { type: "PERSONALACCOUNT", props: { position: "PRIMARY", subtype: "EXTERNAL", balance: "WITHDRAWAL", suspense: false, owner: "REQUIREDANY", charge: "CLIENTPERSONALOUTCOMENETTING", }, identity: "TYPE:PERSONALACCOUNT;DIRECTION:-1;PRIMARY:TRUE;REGISTRATION:FALSE;SUBTYPE:EXTERNAL", marker: "КЛ", component: PersonalAccount, },
-        { type: "PERSONALACCOUNT", props: { position: "PRIMARY", subtype: "EXTERNAL", balance: "ACCRUAL", suspense: true, owner: "REQUIREDSAME", charge: "CLIENTPERSONALINCOMENETTING", }, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "КЛ", component: PersonalAccount, },
+        { type: "PERSONALACCOUNT", props: { position: "PRIMARY", subtype: "EXTERNAL", balance: "ACCRUAL", suspense: true, owner: "ORIGINSAME", charge: "CLIENTPERSONALINCOMENETTING", }, identity: "TYPE:PERSONALACCOUNT;DIRECTION:1;PRIMARY:TRUE;REGISTRATION:TRUE;SUBTYPE:EXTERNAL", marker: "КЛ", component: PersonalAccount, },
         { type: "REGPERSONALACCOUNT", props: { balance: "ACCRUAL", }, identity: "TYPE:REGPERSONALACCOUNT;DIRECTION:1;SUBTYPE:EXTERNAL", marker: "?", component: PersonalAccountRegistration, },
 
         { type: "SERVICECHARGE", identity: "TYPE:SERVICECHARGE", props: { charges: ["CLIENTPERSONALOUTCOMENETTING", "CLIENTPERSONALINCOMENETTING"], }, marker: "%%", component: ServiceCharge, },

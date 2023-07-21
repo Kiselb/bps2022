@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect, useRef } from 'react';
 
 import { Settings } from '../../../../../domain/settings/settings';
-import { WizardCommonProps, WizardStateProps, AccountOwner } from '../../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, AccountOwner } from '../../../../../domain/transactions/types';
 
 import styles from './lendingaccount.module.css';
 import { mock } from './mock';
@@ -23,7 +23,7 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.accountid > 0));
 };
 
-export const LendingAccount: FC<Props & WizardCommonProps & WizardStateProps> = ({ owner, balance, suspense, savedstate, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const LendingAccount: FC<Props & WizardControlProps & WizardContextProps> = ({ owner, balance, suspense, savedstate, onReady, onDirty, onNexty }: (Props & WizardControlProps & WizardContextProps)) => {
     const clientid: number | null = null;
     const [state, setState] = useState<State>(
         (savedstate as State | null) === null?

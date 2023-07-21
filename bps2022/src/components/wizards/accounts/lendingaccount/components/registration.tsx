@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { WizardCommonProps, WizardStateProps, AccountOwner, } from '../../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, AccountOwner, } from '../../../../../domain/transactions/types';
 
 export type Props = Record<string, unknown>;
 
@@ -9,7 +9,7 @@ export type State = {
     accountname: string,
 };
 
-export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const Registration: FC<Props & WizardControlProps & WizardContextProps> = ({ savedstate, onReady, onDirty }: (Props & WizardControlProps & WizardContextProps)) => {
     return (
         <div></div>
     );

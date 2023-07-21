@@ -1,4 +1,5 @@
-import { automaton, WizardPagesTypesUnion, isRegisterPage } from './automaton';
+import { automaton, } from './automaton';
+import { WizardPagesTypesUnion, } from './types';
 import { WizardStageCharges } from './types';
 
 //https://github.com/microsoft/TypeScript/pull/40336

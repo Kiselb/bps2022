@@ -1,6 +1,6 @@
 import React, { FC, useState } from 'react';
 
-import { TransactionGroupSelector } from '../../../../../domain/transactions/automaton';
+import { TransactionGroupSelector } from '../../../../../domain/transactions/types';
 import styles from './selector.module.css';
 
 export type Props = {

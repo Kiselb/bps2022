@@ -4,14 +4,14 @@ import { Checkbox } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 import { Settings } from '../../../../../domain/settings/settings';
-import { WizardCommonProps, WizardStateProps, WizardStageCharges } from '../../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, WizardStageCharges } from '../../../../../domain/transactions/types';
 
 import { Decimal } from '../../../../decimal/decimal';
 
 import styles from './servicecharge.module.css';
 
 export type Props = {
-    charges: WizardStageCharges[],
+    charges?: WizardStageCharges[],
 };
 
 export type Charge = {
@@ -30,7 +30,7 @@ const validate = (state: State): boolean => {
     return (state !== null);
 };
 
-export const ServiceCharge: FC<Props & WizardCommonProps & WizardStateProps> = ({ charges, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const ServiceCharge: FC<Props & WizardControlProps & WizardContextProps> = ({ charges, savedstate, onReady, onDirty, getParam }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setState] = useState<State>(() => {
         if ((savedstate as State | null) === null) {
             const chargeslist: Charges = {
@@ -41,9 +41,16 @@ export const ServiceCharge: FC<Props & WizardCommonProps & WizardStateProps> = (
                 ENTERPRISEEXTERNALINCOME: { charge: null, isabsolute: false, isincluded: false },
                 ENTERPRISEEXTERNALOUTCOME: { charge: null, isabsolute: false, isincluded: false },
             };
-    
-            for(let i = 0; i < charges.length; i++) {
-                chargeslist[charges[i]].charge = 0;
+            if (charges) {
+                for(let i = 0; i < charges.length; i++) {
+                    chargeslist[charges[i]].charge = 0;
+                }
+            } else {
+                Object.keys(chargeslist).forEach(key => {
+                    if (getParam(key) !== null) {
+                        chargeslist[key as WizardStageCharges].charge = 0;
+                    }
+                })
             }
             return ({ type: "SERVICECHARGE", charges: chargeslist });
         }

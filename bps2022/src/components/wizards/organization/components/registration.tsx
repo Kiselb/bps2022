@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect, CSSProperties } from 'react';
 
 import { Input } from 'antd';
 
-import { AccountOwner, WizardCommonProps, WizardStateProps, } from '../../../../domain/transactions/types';
+import { AccountOwner, WizardControlProps, WizardContextProps, } from '../../../../domain/transactions/types';
 
 import { mock_clients } from '../../clients/mock';
 import styles from './registration.module.css';
@@ -41,7 +41,7 @@ const validate = (state: State, client: AccountOwner, subtype: "INTERNAL" | "EXT
     );
 };
 
-export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ balance, subtype, owner, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const Registration: FC<Props & WizardControlProps & WizardContextProps> = ({ balance, subtype, owner, savedstate, onReady, onDirty }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setState] = useState<State>(
         (savedstate as State | null) === null?
         {

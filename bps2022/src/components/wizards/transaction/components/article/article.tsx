@@ -4,7 +4,7 @@ import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 import { Settings } from '../../../../../domain/settings/settings';
-import { WizardCommonProps, WizardStateProps, } from '../../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, } from '../../../../../domain/transactions/types';
 
 import styles from './article.module.css';
 import { mock } from './mock';
@@ -28,7 +28,7 @@ const validate = (state: State) => {
     );
 };
 
-export const Article: FC<Props & WizardCommonProps & WizardStateProps> = ({ subtype, savedstate, suspense, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const Article: FC<Props & WizardControlProps & WizardContextProps> = ({ subtype, savedstate, suspense, onReady, onDirty, onNexty }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setState] = useState<State>(
         (savedstate as State | null) === null?
         {

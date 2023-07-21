@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 
 import { Input } from 'antd';
 
-import { WizardCommonProps, WizardStateProps, AccountOwner, } from '../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, AccountOwner, } from '../../../domain/transactions/types';
 
 import styles from './registration.module.css';
 
@@ -20,7 +20,7 @@ const validate = (state: State, subtype: "INCOME" | "EXPENSES") => {
     if (subtype === "EXPENSES") return ( true && state.name.length > 0 );
 };
 
-export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ subtype, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const Registration: FC<Props & WizardControlProps & WizardContextProps> = ({ subtype, savedstate, onReady, onDirty }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setStae] = useState<State>(
         (savedstate as State | null) === null?
         {

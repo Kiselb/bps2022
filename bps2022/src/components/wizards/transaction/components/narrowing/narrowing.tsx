@@ -1,7 +1,9 @@
 import React, { FC, useState } from 'react';
 
+import { TransactionTypesIdentity, TransactionGroupSelector } from '../../../../../domain/transactions/types';
+import { automaton } from '../../../../../domain/transactions/automaton';
+
 import styles from './narrowing.module.css';
-import { TransactionTypesIdentity, TransactionGroupSelector, automaton } from '../../../../../domain/transactions/automaton';
 
 type Props = {
     origin: TransactionGroupSelector | null,

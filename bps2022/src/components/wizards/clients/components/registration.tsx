@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 
 import { Input, Select } from 'antd';
 
-import { WizardCommonProps, WizardStateProps, AccountOwner, } from '../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, AccountOwner, } from '../../../../domain/transactions/types';
 
 import styles from './registration.module.css';
 import { mock_groups } from '../mock';
@@ -31,7 +31,7 @@ const validate = (state: State) => {
     );
 };
 
-export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ balance, savedstate, onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const Registration: FC<Props & WizardControlProps & WizardContextProps> = ({ balance, savedstate, onReady, onDirty }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setState] = useState<State>(() => (
         (savedstate as State | null) === null?
             {

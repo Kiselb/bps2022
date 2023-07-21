@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect } from 'react';
 
-import { WizardCommonProps, WizardStateProps, AccountOwner, } from '../../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, AccountOwner, } from '../../../../../domain/transactions/types';
 
 import styles from './registration.module.css';
 
@@ -18,7 +18,7 @@ const validate = (state: State) => {
     );
 };
 
-export const Registration: FC<Props & WizardCommonProps & WizardStateProps> = ({ onReady, onDirty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const Registration: FC<Props & WizardControlProps & WizardContextProps> = ({ onReady, onDirty }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setState] = useState<State>({
         type: "REGCASHACOUNT",
         accountname: "",

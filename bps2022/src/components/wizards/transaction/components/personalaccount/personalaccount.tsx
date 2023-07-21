@@ -4,7 +4,7 @@ import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 import { Settings } from '../../../../../domain/settings/settings';
-import { WizardCommonProps, WizardStateProps, AccountOwner, WizardStageCharges } from '../../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, AccountOwner, WizardStageCharges } from '../../../../../domain/transactions/types';
 
 import styles from './personalaccount.module.css';
 import { mock_clients, mock_accounts } from '../../../clients/mock';
@@ -36,7 +36,7 @@ const validate = (state: State): boolean => {
         );
 };
 
-export const PersonalAccount: FC<Props & WizardCommonProps & WizardStateProps> = ({ subtype, balance, suspense, savedstate, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const PersonalAccount: FC<Props & WizardControlProps & WizardContextProps> = ({ subtype, balance, suspense, savedstate, onReady, onDirty, onNexty }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setState] = useState<State>(
         (savedstate as State | null) === null?
         {

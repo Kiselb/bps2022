@@ -4,7 +4,7 @@ import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 import { Settings } from '../../../../../domain/settings/settings';
-import { WizardCommonProps, WizardStateProps, AccountOwner } from '../../../../../domain/transactions/types';
+import { WizardControlProps, WizardContextProps, AccountOwner } from '../../../../../domain/transactions/types';
 
 import styles from './overdraft.module.css';
 import { mock } from './mock';
@@ -27,7 +27,7 @@ const validate = (state: State): boolean => {
     return ((state.notinlist) || (!state.notinlist && state.overdraftid > 0));
 };
 
-export const Overdraft: FC<Props & WizardCommonProps & WizardStateProps> = ({ balance, savedstate, suspense, onReady, onDirty, onNexty }: (Props & WizardCommonProps & WizardStateProps)) => {
+export const Overdraft: FC<Props & WizardControlProps & WizardContextProps> = ({ balance, savedstate, suspense, onReady, onDirty, onNexty }: (Props & WizardControlProps & WizardContextProps)) => {
     const [state, setState] = useState<State>(
         (savedstate as State | null) === null?
         {
